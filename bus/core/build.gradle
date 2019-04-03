@@ -3,6 +3,8 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
 
+    // 主要是用来设置Library发布所有的variants
+    publishNonDefault true
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
@@ -16,6 +18,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions("version")
+    // 产品特性
+    productFlavors {
+        uat {
+            dimension 'version'
+            matchingFallbacks = ['debug', 'release']
+        }
+        prd {
+            dimension 'version'
         }
     }
 }
