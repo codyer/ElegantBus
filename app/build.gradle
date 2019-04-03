@@ -26,9 +26,11 @@ dependencies {
 //    implementation 'com.github.codyer.LiveEventBus:lib:1.0.0'
 //    implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
 //    annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0'
-    implementation project(":bus:lib")
-    implementation project(":bus:core")
+    implementation project(":bus")
     annotationProcessor project(":bus:compiler")
+//    implementation project(":bus:lib")
+//    implementation project(":bus:core")
+//    annotationProcessor project(":bus:compiler")
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
