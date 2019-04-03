@@ -1,0 +1,13 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'java'
+//指定编译的编码
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
+dependencies {
+    compileOnly files(Jvm.current().getToolsJar())
+    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.squareup:javapoet:1.11.1'
+    implementation project(':bus:lib')
+}

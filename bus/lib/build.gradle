@@ -1,0 +1,18 @@
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：CleanFramework  项目：CleanFramework
+ * 当前修改时间：2019年04月02日 15:05:42
+ * 上次修改时间：2019年04月02日 15:05:42
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * Copyright (c) 2019
+ * ************************************************************
+ */
+
+apply plugin: 'java-library'
+//指定编译的编码
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
+sourceCompatibility = "7"
+targetCompatibility = "7"
