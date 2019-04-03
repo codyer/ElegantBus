@@ -8,6 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/bus" />
+            <option value="$PROJECT_DIR$/bus/compiler" />
+            <option value="$PROJECT_DIR$/bus/core" />
+            <option value="$PROJECT_DIR$/bus/lib" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

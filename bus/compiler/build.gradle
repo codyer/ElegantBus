@@ -1,0 +1,29 @@
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：compiler  项目：LiveEventBus
+ * 当前修改时间：2019年04月03日 14:23:13
+ * 上次修改时间：2019年04月03日 14:05:29
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * Copyright (c) 2019
+ * ************************************************************
+ */
+
+import org.gradle.internal.jvm.Jvm
+apply plugin: 'java-library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.codyer'
+//指定编译的编码
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
+tasks.withType(Javadoc) {
+    options.encoding = "UTF-8"
+}
+dependencies {
+    compileOnly files(Jvm.current().getToolsJar())
+    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.squareup:javapoet:1.11.1'
+    implementation project(':bus:lib')
+}
