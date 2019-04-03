@@ -1,15 +1,24 @@
 package com.cody.live.event.bus.app;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.cody.live.event.bus.LiveEventBus;
+import com.cody.live.event.bus.app.event.Scope$demo;
+import com.cody.live.event.bus.core.wrapper.ObserverWrapper;
 
 public class LiveEventBusDemoActivity extends AppCompatActivity {
+    private static int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +30,11 @@ public class LiveEventBusDemoActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            public void onClick(final View view) {
+                count++;
+                Snackbar.make(view, "发送事件监听" + count, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                LiveEventBus.begin().inScope(Scope$demo.class).withEvent$testBean().setValue(new TestBean("count", ("count" + count)));
             }
         });
     }
@@ -44,6 +55,14 @@ public class LiveEventBusDemoActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(LiveEventBusDemoActivity.this, "注册事件监听", Toast.LENGTH_SHORT).show();
+            LiveEventBus.begin().inScope(Scope$demo.class).withEvent$testBean()
+                    .observe(LiveEventBusDemoActivity.this, new ObserverWrapper<TestBean>() {
+                        @Override
+                        public void onChanged(TestBean testBean) {
+                            Toast.makeText(LiveEventBusDemoActivity.this, "事件监听" + testBean.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
             return true;
         }
         return super.onOptionsItemSelected(item);
