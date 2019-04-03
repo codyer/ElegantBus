@@ -22,7 +22,7 @@
 
 
 ## 项目依赖
-# 目前只提供 AndroidX工程:（如果项目是新项目，建议升级）
+### 目前只提供 AndroidX工程:（如果项目是新项目，建议升级）
 
 ```
 implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
@@ -79,7 +79,7 @@ public enum AppDemo {
 ```
 
 - **observeAny**
-# 【2】以下方式注册事件可以接收到注册前发生的事件（最后一次事件）
+### 【2】以下方式注册事件可以接收到注册前发生的事件（最后一次事件）
 
 ```java
 LiveEventBus.begin()
@@ -93,7 +93,7 @@ LiveEventBus.begin()
  ```
 
 - **observeForever**
-# 【3】需要手动取消订阅
+### 【3】需要手动取消订阅
 
  ```java
 LiveEventBus.begin()
@@ -116,7 +116,7 @@ LiveEventBus.begin()
 ```
 
 
-# 【4】取消生命周期相关的所有监听
+### 【4】取消生命周期相关的所有监听
 
 ``` java
  LiveEventBus.begin()
@@ -128,7 +128,7 @@ LiveEventBus.begin()
 
 #### 发送消息
 - **setValue（Object o）**
-# 在主线程发送消息
+### 在主线程发送消息
 
 ```java
 LiveEventBus.begin()
@@ -138,7 +138,7 @@ LiveEventBus.begin()
 ```
 
 - **postValue**
-# 在后台线程发送消息，订阅者会在主线程收到消息
+### 在后台线程发送消息，订阅者会在主线程收到消息
 
 ```java
 LiveEventBus.begin()
