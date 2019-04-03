@@ -13,19 +13,18 @@ combine
 
 
 --关于打包生成
-可以先基于master生成版本{1.0.0}的依赖，项目依赖方式：
-
-implementation 'com.github.codyer.LiveEventBus:lib:1.0.0'
+可以基于master生成版本{1.0.0}的依赖，项目依赖方式：
 
 implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
 
 annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0' //如果使用注解生成事件管理
 
+基本配置
+compileSdkVersion 28
 
-然后修改combine分支bus/gradle文件中的版本为1.0.0,基于版本1.0.0发布新的版本v1.0.0
-这样就可以如下方式依赖
-
-implementation 'com.github.codyer.LiveEventBus:bus:v1.0.0'
-
-annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0'
-
+defaultConfig {
+    minSdkVersion 19
+    targetSdkVersion 28
+    versionCode 1
+    versionName version
+}
