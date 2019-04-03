@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.codyer.LiveEventBus:lib:1.3.0'
-    implementation 'com.github.codyer.LiveEventBus:core:1.3.0'
-    annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.3.0'
+    implementation 'com.github.codyer.LiveEventBus:lib:1.0.0'
+    implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
+    annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0'
 }
