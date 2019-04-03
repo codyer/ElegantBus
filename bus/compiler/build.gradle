@@ -10,8 +10,10 @@
  */
 
 import org.gradle.internal.jvm.Jvm
+apply plugin: 'java-library'
+apply plugin: 'com.github.dcendents.android-maven'
 
-apply plugin: 'java'
+group='com.github.codyer'
 //指定编译的编码
 tasks.withType(JavaCompile){
     options.encoding = "UTF-8"

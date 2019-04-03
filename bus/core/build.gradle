@@ -12,22 +12,11 @@ apply plugin: 'com.github.dcendents.android-maven'
  * ************************************************************
  */
 
-//指定编译的编码
-tasks.withType(JavaCompile){
-    options.encoding = "UTF-8"
-}
-tasks.withType(Javadoc) {
-    options.encoding = "UTF-8"
-}
 repositories {
     mavenCentral()
     google()
     jcenter()
-    maven { url "https://jitpack.io" }
 }
-
-group='com.github.codyer'    // 添加本行
-version = '1.0.1'
 
 android {
     compileSdkVersion 28
@@ -58,29 +47,4 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.1.0-alpha03'
     api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
     api 'androidx.lifecycle:lifecycle-livedata:2.1.0-alpha03'
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.sourceFiles
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-task classesJar(type: Jar) {
-    from "$buildDir/intermediates/classes/release"
-}
-
-artifacts {
-    archives classesJar
-    archives javadocJar
-    archives sourcesJar
 }
