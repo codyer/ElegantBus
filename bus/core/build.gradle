@@ -43,7 +43,7 @@ android {
 }
 
 dependencies {
-    implementation project(':bus:lib')
+    api project(':bus:lib')
     compileOnly 'androidx.appcompat:appcompat:1.1.0-alpha03'
     compileOnly 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
     compileOnly 'androidx.lifecycle:lifecycle-livedata:2.1.0-alpha03'
