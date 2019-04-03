@@ -1,45 +1,86 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：core  项目：LiveEventBus
+ * 当前修改时间：2019年04月03日 14:23:13
+ * 上次修改时间：2019年04月03日 14:12:28
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * Copyright (c) 2019
+ * ************************************************************
+ */
+
+//指定编译的编码
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
+tasks.withType(Javadoc) {
+    options.encoding = "UTF-8"
+}
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+group='com.github.codyer'    // 添加本行
+version = '1.0.1'
 
 android {
     compileSdkVersion 28
 
-    // 主要是用来设置Library发布所有的variants
-    publishNonDefault true
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName version
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    flavorDimensions("version")
-    // 产品特性
-    productFlavors {
-        uat {
-            dimension 'version'
-            matchingFallbacks = ['debug', 'release']
-        }
-        prd {
-            dimension 'version'
-        }
+    lintOptions {
+        abortOnError false
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/java'
     }
 }
 
 dependencies {
     api project(':bus:lib')
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha03'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.1.0-alpha03'
+    api 'androidx.appcompat:appcompat:1.1.0-alpha03'
+    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
+    api 'androidx.lifecycle:lifecycle-livedata:2.1.0-alpha03'
 }
 
-repositories {
-    google()
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task classesJar(type: Jar) {
+    from "$buildDir/intermediates/classes/release"
+}
+
+artifacts {
+    archives classesJar
+    archives javadocJar
+    archives sourcesJar
 }

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：LiveEventBus.java  模块：core  项目：CleanFramework
- * 当前修改时间：2019年04月02日 14:09:33
- * 上次修改时间：2019年04月02日 13:49:08
+ * 文件：LiveEventBus.java  模块：core  项目：LiveEventBus
+ * 当前修改时间：2019年04月03日 14:23:13
+ * 上次修改时间：2019年04月03日 14:20:57
  * 作者：Cody.yi   https://github.com/codyer
  *
  * Copyright (c) 2019
@@ -11,11 +11,9 @@
 
 package com.cody.live.event.bus;
 
-import com.cody.live.event.bus.lib.IEvent;
 import com.cody.live.event.bus.core.factory.BusFactory;
+import com.cody.live.event.bus.lib.IEvent;
 import com.cody.live.event.bus.lib.annotation.AutoGenerate;
-import com.cody.live.event.bus.lib.annotation.EventScope;
-import com.cody.live.event.bus.lib.exception.MissingEventScopeException;
 import com.cody.live.event.bus.lib.exception.ScopeInactiveException;
 import com.cody.live.event.bus.lib.exception.WrongTypeException;
 
@@ -31,8 +29,8 @@ import java.lang.reflect.Proxy;
  * LiveEventBus.begin()
  *                 .inScope(ToBeCompilerOut.class)
  *                 .withEvent$userDefinedEvent()
- *                 .observe(null, new ObserverWrapper<String>() {
- *                     @ Override
+ *                 .observe(null, new ObserverWrapper&lt;String&gt;() {
+ *                     Override
  *                     public void onChanged(@Nullable String s) {
  *                     }
  *                 });
@@ -61,8 +59,9 @@ public class LiveEventBus {
      * 在什么范围
      *
      * @param scopeClass 范围，通过注解自动生成的类，如果没有生成，请使用注解
-     * @see EventScope 注解枚举类，并使用
-     * @see com.cody.live.event.bus.lib.annotation.Event 注解事件
+     *  com.cody.live.event.bus.lib.annotation.EventScope 注解枚举类，并使用
+     *  com.cody.live.event.bus.lib.annotation.Event 注解事件
+     * @return 返回代理类实例
      */
     @SuppressWarnings("unchecked")
     public synchronized <T extends IEvent> T inScope(Class<T> scopeClass) {
