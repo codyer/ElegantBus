@@ -1,6 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-
 /*
  * ************************************************************
  * 文件：build.gradle  模块：core  项目：LiveEventBus
@@ -37,9 +35,4 @@ android {
     lintOptions {
         abortOnError false
     }
-}
-
-dependencies {
-    api project(':bus:lib')
-    api project(':bus:core')
 }
