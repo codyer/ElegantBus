@@ -67,7 +67,7 @@ final public class LiveEventWrapper<T> {
      * 设置监听之前发送的消息也可以接受到
      */
     public void observeAny(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observer) {
-        observer.sequence = 0;
+        observer.sequence = -1;
         mMutableLiveData.observe(owner, filterObserver(observer));
     }
 
@@ -96,7 +96,7 @@ final public class LiveEventWrapper<T> {
         return observerWrapper.observer = new Observer<ValueWrapper<T>>() {
             @Override
             public void onChanged(@Nullable ValueWrapper<T> valueWrapper) {
-                if (valueWrapper != null && valueWrapper.sequence >= observerWrapper.sequence) {
+                if (valueWrapper != null && valueWrapper.sequence > observerWrapper.sequence) {
                     observerWrapper.onChanged(valueWrapper.value);
                 }
             }

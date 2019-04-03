@@ -39,7 +39,7 @@ public class BusFactory {
     public <T> LiveEventWrapper<T> create(String scope, String event) {
         ScopeHolder<Object> scopeHolder = null;
         if (mScopeBus.containsKey(scope)) {
-            scopeHolder = mScopeBus.get(event);
+            scopeHolder = mScopeBus.get(scope);
         }
         if (scopeHolder == null) {
             scopeHolder = new ScopeHolder<>(scope, event);

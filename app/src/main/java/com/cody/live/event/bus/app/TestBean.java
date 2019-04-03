@@ -8,6 +8,15 @@ public class TestBean {
     private String name;
     private String code;
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TestBean{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", code='").append(code).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
     public TestBean(String name, String code) {
         this.name = name;
         this.code = code;
