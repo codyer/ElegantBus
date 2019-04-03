@@ -24,9 +24,13 @@
 ## 项目依赖
 ### 目前只提供 AndroidX工程:（如果项目是新项目，建议升级）
 
-```
+```java
 implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
-annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0' //如果使用注解生成事件管理
+```
+
+### 使用注解生成事件管理接口
+```java
+annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0' 
 ```
 
 - [x]  升级方式--Refactor->Migrate to AndroidX
