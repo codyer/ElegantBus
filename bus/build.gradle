@@ -42,5 +42,4 @@ android {
 dependencies {
     api project(':bus:lib')
     api project(':bus:core')
-    api project(':bus:compiler')
 }
