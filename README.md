@@ -29,29 +29,16 @@ implementation 'com.github.codyer.LiveEventBus:core:1.0.0'
 annotationProcessor 'com.github.codyer.LiveEventBus:compiler:1.0.0' //如果使用注解生成事件管理
 ```
 
--[x] 升级方式--Refactor->Migrate to AndroidX
--[x] 项目降级--请自行降级 Refactor->Migrate App to AppCompat
-
-
-# core 代码配置
-``` java
-compileSdkVersion 28
-
-defaultConfig {
-    minSdkVersion 19
-    targetSdkVersion 28
-    versionCode 1
-    versionName version
-}
-```
+- [x]  升级方式--Refactor->Migrate to AndroidX
+- [x]  项目降级--请自行降级 Refactor->Migrate App to AppCompat
 
 
 ### 使用介绍
 #### 事件定义
--[x] 支持配置以区域为单位的事件开关
--[x] 统一事件管理
--[x] 根据实际情况开启关闭事件定义
--[x] 事件分领域（scope）,不同领域同名事件互不干扰
+- [x]  支持配置以区域为单位的事件开关
+- [x]  统一事件管理
+- [x]  根据实际情况开启关闭事件定义
+- [x]  事件分领域（scope）,不同领域同名事件互不干扰
 
 ```java
 @EventScope(name = "demo",active = true)
@@ -65,7 +52,7 @@ public enum AppDemo {
 #### 订阅消息
 
 - **observe**
-【1】生命周期感知，不需要手动取消订阅，以下方式只会收到注册后发生的事件
+### 【1】生命周期感知，不需要手动取消订阅，以下方式只会收到注册后发生的事件
 
 ```java
  LiveEventBus.begin()
@@ -106,7 +93,7 @@ LiveEventBus.begin()
             });
 ```
 
-- 取消订阅
+#### 取消订阅
 
 ```java
 LiveEventBus.begin()
@@ -137,7 +124,7 @@ LiveEventBus.begin()
             .setValue(value);
 ```
 
-- **postValue**
+- **postValue(Obeject o)**
 ### 在后台线程发送消息，订阅者会在主线程收到消息
 
 ```java
@@ -149,8 +136,20 @@ LiveEventBus.begin()
 
 
 ## 混淆规则
-因为没有使用反射，暂无
+暂无
 
+## core代码配置
+
+``` java
+compileSdkVersion 28
+
+defaultConfig {
+    minSdkVersion 19
+    targetSdkVersion 28
+    versionCode 1
+    versionName 1.0.0
+}
+```
 
 ## 版本
 
