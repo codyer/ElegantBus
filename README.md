@@ -174,6 +174,9 @@ defaultConfig {
 ---|---
 1.0.0 | 初版，支持基本功能
 
+## 为了方便统一管理，新的变更和优化移至component下面 
+请参考[Component](https://github.com/codyer/component) 下的代码
+
 
 ## 主要功能提交记录
 1. 主要功能完成（Apr. 3, 2019）
