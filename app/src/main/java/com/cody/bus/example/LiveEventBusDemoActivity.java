@@ -1,7 +1,9 @@
-package com.cody.live.event.bus.app;
+package com.cody.bus.example;
 
 import android.os.Bundle;
 
+import com.cody.bus.example.event.Scope$demo;
+import com.cody.live.event.bus.app.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -14,7 +16,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.cody.live.event.bus.LiveEventBus;
-import com.cody.live.event.bus.app.event.Scope$demo;
 import com.cody.live.event.bus.core.wrapper.ObserverWrapper;
 
 public class LiveEventBusDemoActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.cody.live.event.bus.app;
+package com.cody.bus.example;
 
 /**
  * Created by xu.yi. on 2019/4/3.

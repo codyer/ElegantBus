@@ -10,20 +10,12 @@
  */
 
 import org.gradle.internal.jvm.Jvm
-apply plugin: 'java-library'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.codyer'
-//指定编译的编码
-tasks.withType(JavaCompile){
-    options.encoding = "UTF-8"
-}
-tasks.withType(Javadoc) {
-    options.encoding = "UTF-8"
-}
+apply from: "${project.rootDir}/config-lib.gradle"
 dependencies {
     compileOnly files(Jvm.current().getToolsJar())
-    implementation 'com.google.auto.service:auto-service:1.0-rc2'
-    implementation 'com.squareup:javapoet:1.11.1'
     implementation project(':bus:lib')
+    implementation rootProject.ext.dependencies["javapoet"]
+    implementation rootProject.ext.dependencies["auto-service"]
+    annotationProcessor rootProject.ext.dependencies["auto-service"]
 }

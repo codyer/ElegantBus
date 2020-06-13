@@ -10,7 +10,8 @@
  * ************************************************************
  */
 
-
+apply from: "config-define.gradle"
+apply from: "config-versions.gradle"
 buildscript {
     repositories {
         google()
@@ -18,15 +19,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.6.3'
+        // 使用github仓库代码
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
 allprojects {
     repositories {
+        //本地Maven仓库地址
+        maven {
+            url LOCAL_REPOSITORY
+        }
         maven { url 'https://jitpack.io' }
-        mavenCentral()
         google()
         jcenter()
     }

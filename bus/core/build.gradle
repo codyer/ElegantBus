@@ -1,6 +1,3 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-
 /*
  * ************************************************************
  * 文件：build.gradle  模块：core  项目：LiveEventBus
@@ -12,39 +9,9 @@ apply plugin: 'com.github.dcendents.android-maven'
  * ************************************************************
  */
 
-repositories {
-    mavenCentral()
-    google()
-    jcenter()
-}
-
-android {
-    compileSdkVersion 28
-
-    defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 1
-        versionName version
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    lintOptions {
-        abortOnError false
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/java'
-    }
-}
-
+apply from: "${project.rootDir}/config-aar.gradle"
 dependencies {
-    api project(':bus:lib')
-    compileOnly 'androidx.appcompat:appcompat:1.1.0-alpha03'
-    compileOnly 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
-    compileOnly 'androidx.lifecycle:lifecycle-livedata:2.1.0-alpha03'
+    implementation project(':bus:lib')
+    implementation rootProject.ext.dependencies["lifecycle"]
+    implementation rootProject.ext.dependencies["livedata"]
 }

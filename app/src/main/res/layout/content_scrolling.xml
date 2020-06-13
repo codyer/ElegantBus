@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.cody.live.event.bus.app.LiveEventBusDemoActivity"
+    tools:context="com.cody.live.event.bus.app.com.cody.bus.example.LiveEventBusDemoActivity"
     tools:showIn="@layout/activity_live_event_bus_demo">
 
     <TextView

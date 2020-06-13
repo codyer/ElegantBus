@@ -1,0 +1,55 @@
+/*
+ * ************************************************************
+ * 文件：config-aar.gradle  模块：component  项目：component
+ * 当前修改时间：2019年04月23日 18:23:20
+ * 上次修改时间：2019年04月13日 08:44:03
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：component
+ * Copyright (c) 2019
+ * ************************************************************
+ */
+
+apply plugin: 'com.android.library'
+if (isLocalMaven) {
+    apply from: "${project.rootDir}/config-local-maven.gradle"
+} else {
+    apply plugin: 'com.github.dcendents.android-maven'
+    group = 'com.github.codyer'
+}
+
+repositories {
+    google()
+    jcenter()
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+        // dex突破65535的限制
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    if (!isLocalMaven) {//本地仓库不需要注释
+        // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
+        apply from: "${project.rootDir}/config-doc.gradle"
+    }
+}

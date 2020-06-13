@@ -1,4 +1,5 @@
-package com.cody.live.event.bus.app;
+package com.cody.bus.example;
+
 
 import com.cody.live.event.bus.lib.annotation.Event;
 import com.cody.live.event.bus.lib.annotation.EventScope;
