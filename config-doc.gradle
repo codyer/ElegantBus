@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-doc.gradle  模块：DoveBus  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 当前修改时间：2020年06月14日 23:57:03
+ * 上次修改时间：2020年06月14日 23:20:34
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：DoveBus
@@ -52,13 +52,11 @@ artifacts {
 }
 
 /*在javadoc task执行之前先添加第三方的依赖进来，否则会找不到相关的jar包*/
-/*
 afterEvaluate {
     javadoc.classpath += files(android.libraryVariants.collect { variant2 ->
         variant2.getJavaCompiler().classpath.files
     })
 }
-*/
 
 afterEvaluate {
     javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath

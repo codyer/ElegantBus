@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：app  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 当前修改时间：2020年06月14日 23:57:03
+ * 上次修改时间：2020年06月14日 23:40:44
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：app
@@ -39,6 +39,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation rootProject.ext.dependencies["material"]
-    implementation rootProject.ext.dependencies["bus-core"]
+    implementation rootProject.ext.dependencies["bus-ipc"]
+//    implementation rootProject.ext.dependencies["bus-core"]
     annotationProcessor rootProject.ext.dependencies["bus-compiler"]
 }

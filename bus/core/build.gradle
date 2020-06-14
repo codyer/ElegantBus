@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：core  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 当前修改时间：2020年06月14日 23:57:03
+ * 上次修改时间：2020年06月14日 23:42:17
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -12,6 +12,7 @@
 
 apply from: "${project.rootDir}/config-aar.gradle"
 dependencies {
+    implementation project(':bus:lib')
     implementation rootProject.ext.dependencies["lifecycle"]
     implementation rootProject.ext.dependencies["livedata"]
 }
