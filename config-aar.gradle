@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-aar.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月15日 01:45:52
+ * 上次修改时间：2020年06月15日 01:45:00
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -40,6 +40,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java', 'src/main/aidl']
+            resources.srcDirs = ['src/main/java', 'src/main/aidl']
+            aidl.srcDirs = ['src/main/aidl']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
         }
     }
 
