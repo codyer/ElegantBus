@@ -2,7 +2,7 @@ package com.cody.bus.example;
 
 /**
  * Created by xu.yi. on 2019/4/3.
- * LiveEventBus
+ * DoveBus
  */
 public class TestBean {
     private String name;
@@ -10,11 +10,9 @@ public class TestBean {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TestBean{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", code='").append(code).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "TestBean{" + "name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                '}';
     }
 
     public TestBean(String name, String code) {

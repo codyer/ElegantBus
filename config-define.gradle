@@ -30,7 +30,7 @@ def getGitBranch() {
 /**
  * 获取Git 版本号
  */
-def getGitSHA() {
+static def getGitSHA() {
     return 'git rev-parse --short HEAD'.execute().text.trim()
 }
 
@@ -107,12 +107,12 @@ def getJenkinsBuildCode() {
  * tag or branch contains compiler
  * @return
  */
-boolean isInScope(String scope) {
-    return getGitTag().contains(scope) || getGitBranch().contains(scope)
+boolean isInGroup(String group) {
+    return getGitTag().contains(group) || getGitBranch().contains(group)
 }
 
 def getMavenGroupId() {
-    if (isInScope("local")) {
+    if (isInGroup("local")) {
         return LOCAL_GROUP_ID
     } else {
         return REMOTE_GROUP_ID
@@ -128,9 +128,9 @@ ext {
     gitSHA = getGitSHA()
     jenkinsRevision = getJenkinsBuildCode()
     jenkinsName = getJenkinsName()
-    isJitPack = isInScope("remote")
-    isApp = isInScope("app")
-    isComponent = isInScope("component")
-    isLocalMaven = isInScope("local")
+    isJitPack = isInGroup("remote")
+    isApp = isInGroup("app")
+    isComponent = isInGroup("component")
+    isLocalMaven = isInGroup("local")
     mavenGroupId = getMavenGroupId()
 }

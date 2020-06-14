@@ -25,8 +25,8 @@ tasks.withType(JavaCompile) {
 // 打包源码jar
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    archiveClassifier.convention('sources');
-    archiveClassifier.set('sources');
+    archiveClassifier.convention('sources')
+    archiveClassifier.set('sources')
 }
 
 task javadoc(type: Javadoc) {
@@ -41,8 +41,8 @@ task javadoc(type: Javadoc) {
 
 // 打包文档jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.convention('sources');
-    archiveClassifier.set('sources');
+    archiveClassifier.convention('sources')
+    archiveClassifier.set('sources')
     from javadoc.destinationDir
 }
 

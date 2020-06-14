@@ -34,14 +34,14 @@ tasks.withType(Javadoc) {
 task lint {}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.convention('sources');
-    archiveClassifier.set('sources');
+    archiveClassifier.convention('sources')
+    archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.convention('sources');
-    archiveClassifier.set('sources');
+    archiveClassifier.convention('sources')
+    archiveClassifier.set('sources')
     from javadoc.destinationDir
 }
 

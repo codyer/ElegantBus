@@ -11,6 +11,6 @@
 
 apply from: "${project.rootDir}/config-aar.gradle"
 dependencies {
-    implementation rootProject.ext.dependencies["lifecycle"]
-    implementation rootProject.ext.dependencies["livedata"]
+    implementation project(':bus:core')
+    implementation rootProject.ext.dependencies["fastjson"]
 }
