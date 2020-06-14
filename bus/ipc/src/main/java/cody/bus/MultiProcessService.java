@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessService.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月15日 02:50:34
+ * 上次修改时间：2020年06月15日 02:17:27
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -30,7 +30,7 @@ import java.util.Map;
  * 跨进程事件总线支持服务
  */
 public class MultiProcessService extends Service {
-    public final static String CLASS_NAME = "cody.bus.BusProcessService";
+    public final static String CLASS_NAME = "cody.bus.MultiProcessService";
     private final RemoteCallbackList<IBusListener> mBusListener = new RemoteCallbackList<>();
     private final String mProcessName;
     private final Map<String, Event> mProcessCacheMap = new HashMap<>();
