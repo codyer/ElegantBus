@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：DoveBus.java  模块：core  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 文件：ElegantBus.java  模块：core  项目：ElegantBus
+ * 当前修改时间：2020年06月15日 00:35:24
+ * 上次修改时间：2020年06月15日 00:30:33
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -21,8 +21,8 @@ import androidx.annotation.NonNull;
  * 使用 LiveData 实现类似event bus功能，支持生命周期管理
  */
 @SuppressWarnings("unused")
-public class DoveBus {
-    public final static String DOVE_TAG = "DoveBus";
+public class ElegantBus {
+    public final static String ELEGANT_TAG = "ElegantBus";
 
     /**
      * 获取默认域的事件包装类

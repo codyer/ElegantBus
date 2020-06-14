@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ipc  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 文件：MultiProcessImpl.java  模块：ipc  项目：ElegantBus
+ * 当前修改时间：2020年06月15日 00:35:24
+ * 上次修改时间：2020年06月15日 00:30:33
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -100,13 +100,13 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
                     @Override
                     public void onPost(String group, String event, String type, String value) {
                         postToCurrentProcess(group, event, type, value, false);
-                        Log.d(DoveBus.DOVE_TAG, "onPost(" + value + ")to process=" + Application.getProcessName());
+                        Log.d(ElegantBus.ELEGANT_TAG, "onPost(" + value + ")to process=" + Application.getProcessName());
                     }
 
                     @Override
                     public void onPostInit(String group, String event, String type, String value) {
                         postToCurrentProcess(group, event, type, value, true);
-                        Log.d(DoveBus.DOVE_TAG, "onPostInit(" + value + ")to process=" + Application.getProcessName());
+                        Log.d(ElegantBus.ELEGANT_TAG, "onPostInit(" + value + ")to process=" + Application.getProcessName());
                     }
                 });
             } catch (RemoteException e) {
@@ -116,7 +116,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.d(DoveBus.DOVE_TAG, "onServiceDisconnected id=" + Thread.currentThread().getName());
+            Log.d(ElegantBus.ELEGANT_TAG, "onServiceDisconnected id=" + Thread.currentThread().getName());
         }
     };
 

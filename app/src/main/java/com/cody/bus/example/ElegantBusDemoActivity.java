@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：DoveBusDemoActivity.java  模块：app  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 文件：ElegantBusDemoActivity.java  模块：app  项目：ElegantBus
+ * 当前修改时间：2020年06月15日 00:35:24
+ * 上次修改时间：2020年06月15日 00:30:33
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：app
@@ -26,7 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import cody.bus.ObserverWrapper;
 
 
-public class DoveBusDemoActivity extends AppCompatActivity {
+public class ElegantBusDemoActivity extends AppCompatActivity {
     private static int count = 0;
 
     @Override
@@ -57,12 +57,12 @@ public class DoveBusDemoActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Toast.makeText(DoveBusDemoActivity.this, "注册事件监听", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ElegantBusDemoActivity.this, "注册事件监听", Toast.LENGTH_SHORT).show();
 
-            MyAppEventBus.testBean().observe(DoveBusDemoActivity.this, new ObserverWrapper<TestBean>() {
+            MyAppEventBus.testBean().observe(ElegantBusDemoActivity.this, new ObserverWrapper<TestBean>() {
                 @Override
                 public void onChanged(TestBean testBean) {
-                    Toast.makeText(DoveBusDemoActivity.this, "事件监听" + testBean.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ElegantBusDemoActivity.this, "事件监听" + testBean.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
             return true;

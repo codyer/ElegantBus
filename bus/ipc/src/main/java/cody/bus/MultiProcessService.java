@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：MultiProcessService.java  模块：ipc  项目：DoveBus
- * 当前修改时间：2020年06月14日 23:12:17
- * 上次修改时间：2020年06月14日 23:11:57
+ * 文件：MultiProcessService.java  模块：ipc  项目：ElegantBus
+ * 当前修改时间：2020年06月15日 00:35:24
+ * 上次修改时间：2020年06月15日 00:30:33
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -48,7 +48,7 @@ public class MultiProcessService extends Service {
 
         @Override
         public void post(String process, String group, String event, String type, String value) throws RemoteException {
-            Log.d(DoveBus.DOVE_TAG, "process=" + process + "\nvalue=" + value);
+            Log.d(ElegantBus.ELEGANT_TAG, "process=" + process + "\nvalue=" + value);
             Event e = new Event(group, event, type, value);
             postValueToOtherProcess(process, e);
         }
@@ -91,9 +91,9 @@ public class MultiProcessService extends Service {
             if (listener == null) continue;
             if (isBusProcess(listener)) {
                 mProcessCacheMap.put(event.getKey(), event);
-                Log.d(DoveBus.DOVE_TAG, "filter process not to post, add to cache:" + listener.process());
+                Log.d(ElegantBus.ELEGANT_TAG, "filter process not to post, add to cache:" + listener.process());
             } else if (isSameProcess(listener, process)) {
-                Log.d(DoveBus.DOVE_TAG, "filter process not to post:" + listener.process());
+                Log.d(ElegantBus.ELEGANT_TAG, "filter process not to post:" + listener.process());
             } else {
                 listener.onPost(event.group, event.event, event.type, event.value);
             }

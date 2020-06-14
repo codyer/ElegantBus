@@ -1,4 +1,4 @@
-# DoveBus
+# ElegantBus
 [![](https://jitpack.io/v/codyer/component.svg)](https://jitpack.io/#codyer/component)
 
 基于LiveData，实现eventBus，事件统一管理，动态APT生成，生命周期管理
@@ -40,12 +40,12 @@
 ### 目前只提供 AndroidX工程:（如果项目是新项目，建议升级）
 
 ```java
-implementation 'com.github.codyer.DoveBus:core:1.0.0'
+implementation 'com.github.codyer.ElegantBus:core:1.0.0'
 ```
 
 ### 使用注解生成事件管理接口
 ```java
-annotationProcessor 'com.github.codyer.DoveBus:compiler:1.0.0'
+annotationProcessor 'com.github.codyer.ElegantBus:compiler:1.0.0'
 ```
 
 - [x]  升级方式--Refactor->Migrate to AndroidX
@@ -74,7 +74,7 @@ public enum AppDemo {
 ### 【1】生命周期感知，不需要手动取消订阅，以下方式只会收到注册后发生的事件
 
 ```java
- DoveBus.begin()
+ ElegantBus.begin()
         .inGroup(Group$demo.class)// Group$***为自动生成的事件接口
         .withEvent$testBean()
         .observe(this, new ObserverWrapper<TestBean>() {
@@ -88,7 +88,7 @@ public enum AppDemo {
 ### 【2】以下方式注册事件可以接收到注册前发生的事件（最后一次事件）
 
 ```java
-DoveBus.begin()
+ElegantBus.begin()
             .inGroup(Group$demo.class)
             .withEvent$testBean()
             .observeAny(this, new ObserverWrapper<TestBean>() {
@@ -102,7 +102,7 @@ DoveBus.begin()
 ### 【3】需要手动取消订阅
 
  ```java
-DoveBus.begin()
+ElegantBus.begin()
             .inGroup(Group$demo.class)
             .withEvent$testBean()
             .observeForever(new ObserverWrapper<TestBean>() {
@@ -115,7 +115,7 @@ DoveBus.begin()
 #### 取消订阅
 
 ```java
-DoveBus.begin()
+ElegantBus.begin()
             .inGroup(Group$demo.class)
             .withEvent$testBean().
 	        .removeObserver(observer);
@@ -125,7 +125,7 @@ DoveBus.begin()
 ### 【4】取消生命周期相关的所有监听
 
 ``` java
- DoveBus.begin()
+ ElegantBus.begin()
                 .inGroup(Group$demo.class)
                 .withEvent$testBean()
                 .removeObservers(this);
@@ -137,7 +137,7 @@ DoveBus.begin()
 ### 在主线程发送消息
 
 ```java
-DoveBus.begin()
+ElegantBus.begin()
             .inGroup(Group$demo.class)
             .withEvent$testBean()
             .setValue(value);
@@ -147,7 +147,7 @@ DoveBus.begin()
 ### 在后台线程发送消息，订阅者会在主线程收到消息
 
 ```java
-DoveBus.begin()
+ElegantBus.begin()
             .inGroup(Group$demo.class)
             .withEvent$testBean()
             .postValue(value);
@@ -186,14 +186,14 @@ defaultConfig {
 
 ## 其他
 - 欢迎提Issue与作者交流
-- 欢迎提Pull request，帮助 fix bug，增加新的feature，让DoveBus变得更强大、更好用
+- 欢迎提Pull request，帮助 fix bug，增加新的feature，让ElegantBus变得更强大、更好用
 
 
 ## 感谢如下作者提供新的思路，因为不想用反射，所以基于原作者做了重构，具体实现原理以及原文链接参见如下
 
 
 #### 实现原理
-- DoveBus的实现原理可参见作者在美团技术博客上的博文：
+- ElegantBus的实现原理可参见作者在美团技术博客上的博文：
 [Android消息总线的演进之路：用LiveDataBus替代RxBus、EventBus](https://tech.meituan.com/Android_LiveDataBus.html)
-- 该博文是初版DoveBus的实现原理，与当前版本的实现可能不一致，仅供参考
-1. [invoking-message](https://github.com/JeremyLiao/invoking-message) 消息总线框架，基于DoveBus实现。它颠覆了传统消息总线定义和使用的方式，通过链式的方法调用发送和接收消息，使用更简单
+- 该博文是初版ElegantBus的实现原理，与当前版本的实现可能不一致，仅供参考
+1. [invoking-message](https://github.com/JeremyLiao/invoking-message) 消息总线框架，基于ElegantBus实现。它颠覆了传统消息总线定义和使用的方式，通过链式的方法调用发送和接收消息，使用更简单
