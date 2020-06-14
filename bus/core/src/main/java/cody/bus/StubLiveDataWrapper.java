@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：StubLiveDataWrapper.java  模块：component-bus-core  项目：component
- * 当前修改时间：2020年06月04日 10:33:53
- * 上次修改时间：2020年06月04日 10:33:53
+ * 文件：StubLiveDataWrapper.java  模块：core  项目：DoveBus
+ * 当前修改时间：2020年06月14日 23:12:17
+ * 上次修改时间：2020年06月14日 23:11:57
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：component-bus-core
+ * 描述：core
  * Copyright (c) 2020
  * ************************************************************
  */

@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ *************************************************************
+  ~ 文件：ic_launcher_round.xml  模块：app  项目：DoveBus
+  ~ 当前修改时间：2020年06月14日 23:12:17
+  ~ 上次修改时间：2020年06月14日 23:11:57
+  ~ 作者：Cody.yi   https://github.com/codyer
+  ~
+  ~ 描述：app
+  ~ Copyright (c) 2020
+  ~ *************************************************************
+  -->
+
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
     <foreground android:drawable="@drawable/ic_launcher_foreground" />

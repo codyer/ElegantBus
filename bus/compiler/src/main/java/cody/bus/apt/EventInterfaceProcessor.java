@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：EventInterfaceProcessor.java  模块：bus-compiler  项目：component
- * 当前修改时间：2019年04月23日 18:23:20
- * 上次修改时间：2019年04月13日 08:44:03
+ * 文件：EventInterfaceProcessor.java  模块：compiler  项目：DoveBus
+ * 当前修改时间：2020年06月14日 23:12:17
+ * 上次修改时间：2020年06月14日 23:11:57
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：bus-compiler
- * Copyright (c) 2019
+ * 描述：compiler
+ * Copyright (c) 2020
  * ************************************************************
  */
 
