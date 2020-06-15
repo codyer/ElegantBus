@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-doc.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 10:57:28
- * 上次修改时间：2020年06月15日 10:19:48
+ * 当前修改时间：2020年06月15日 14:54:49
+ * 上次修改时间：2020年06月15日 14:46:53
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -31,7 +31,6 @@ task sourcesJar(type: Jar) {
 
 task javadoc(type: Javadoc) {
     source += android.sourceSets.main.java.sourceFiles
-    source += "build/generated/aidl_source_output_dir/"
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     classpath += configurations.compile
     if (Jvm.current().getJavaVersion() == JavaVersion.VERSION_1_8) {
@@ -42,23 +41,19 @@ task javadoc(type: Javadoc) {
 
 // 打包文档jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.convention('sources')
-    archiveClassifier.set('sources')
+    archiveClassifier.convention('javadoc')
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
-task classesJar(type: Jar) {
-    from "$buildDir/intermediates/classes/release"
-}
-
 artifacts {
-    archives classesJar
-    archives javadocJar
     archives sourcesJar
+    archives javadocJar
 }
 
 /*在javadoc task执行之前先添加第三方的依赖进来，否则会找不到相关的jar包*/
 afterEvaluate {
+    javadoc.source += compileReleaseAidl.sourceOutputDir.get().asFileTree
     javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
 }
 

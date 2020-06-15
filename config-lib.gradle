@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-lib.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 10:57:28
- * 上次修改时间：2020年06月15日 10:56:21
+ * 当前修改时间：2020年06月15日 14:54:49
+ * 上次修改时间：2020年06月15日 14:41:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -10,7 +10,6 @@
  * ************************************************************
  */
 
-import org.gradle.internal.jvm.Jvm
 
 apply plugin: 'java-library'
 
@@ -43,21 +42,15 @@ if (!isNoDoc) {//本地仓库不需要注释
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        archiveClassifier.convention('sources')
-        archiveClassifier.set('sources')
+        archiveClassifier.convention('javadoc')
+        archiveClassifier.set('javadoc')
         from javadoc.destinationDir
     }
 
-    task classesJar(type: Jar) {
-        from "$buildDir/intermediates/classes/release"
-    }
-
     artifacts {
-        archives classesJar
-        archives javadocJar
         archives sourcesJar
+        archives javadocJar
     }
-
 
     javadoc {
         options {
