@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月15日 10:05:19
+ * 上次修改时间：2020年06月15日 09:38:54
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -62,7 +62,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     static void support(Context context, String mainApplicationId) {
         ready().mContext = context;
         ready().mHostName = mainApplicationId;
-        ready().bindService(mainApplicationId);
+        ready().bindService();
     }
 
     /**
@@ -80,7 +80,11 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     @Override
     public <T> void post(String group, String event, String type, T value) {
         try {
-            ready().mBusProcess.post(ready().mProcessName, group, event, type, JSON.toJSONString(value));
+            if (mBusProcess == null) {
+                bindService();
+            } else {
+                mBusProcess.post(mProcessName, group, event, type, JSON.toJSONString(value));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,6 +120,9 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            mBusProcess = null;
+            mBusListener = null;
+            mContext = null;
             Log.d(ElegantBus.ELEGANT_TAG, "onServiceDisconnected id=" + Thread.currentThread().getName());
         }
     };
@@ -133,9 +140,9 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
     }
 
-    private void bindService(final String mainApplicationId) {
+    private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setComponent(new ComponentName(mainApplicationId, MultiProcessService.CLASS_NAME));
+        intent.setComponent(new ComponentName(hostName(), MultiProcessService.CLASS_NAME));
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 

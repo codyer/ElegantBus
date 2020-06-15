@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月15日 10:05:19
+ * 上次修改时间：2020年06月15日 08:36:51
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -17,7 +17,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.3'
