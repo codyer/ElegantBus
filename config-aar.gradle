@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-aar.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 02:50:34
- * 上次修改时间：2020年06月15日 02:50:23
+ * 当前修改时间：2020年06月15日 10:57:28
+ * 上次修改时间：2020年06月15日 10:13:20
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -43,6 +43,10 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'src/main/AndroidManifest.xml'
@@ -58,9 +62,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
 
-    if (!isNoDoc) {//本地仓库不需要注释
-        // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
-        apply from: "${project.rootDir}/config-doc.gradle"
-    }
+if (!isNoDoc) {//本地仓库不需要注释
+    // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
+    apply from: "${project.rootDir}/config-doc.gradle"
 }

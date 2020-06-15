@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-doc.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 10:05:19
- * 上次修改时间：2020年06月15日 10:01:46
+ * 当前修改时间：2020年06月15日 10:57:28
+ * 上次修改时间：2020年06月15日 10:19:48
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -47,9 +47,14 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+task classesJar(type: Jar) {
+    from "$buildDir/intermediates/classes/release"
+}
+
 artifacts {
-    archives sourcesJar
+    archives classesJar
     archives javadocJar
+    archives sourcesJar
 }
 
 /*在javadoc task执行之前先添加第三方的依赖进来，否则会找不到相关的jar包*/
@@ -63,6 +68,6 @@ javadoc {
         locale 'en_US'
         encoding 'UTF-8'
         charSet 'UTF-8'
-        links "http://docs.oracle.com/javase/7/docs/api"
+        links "http://docs.oracle.com/javase/8/docs/api"
     }
 }

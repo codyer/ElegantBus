@@ -1,14 +1,16 @@
 /*
  * ************************************************************
  * 文件：config-lib.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 02:50:34
- * 上次修改时间：2020年06月15日 02:50:23
+ * 当前修改时间：2020年06月15日 10:57:28
+ * 上次修改时间：2020年06月15日 10:56:21
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
  * Copyright (c) 2020
  * ************************************************************
  */
+
+import org.gradle.internal.jvm.Jvm
 
 apply plugin: 'java-library'
 
@@ -46,10 +48,16 @@ if (!isNoDoc) {//本地仓库不需要注释
         from javadoc.destinationDir
     }
 
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
+    task classesJar(type: Jar) {
+        from "$buildDir/intermediates/classes/release"
     }
+
+    artifacts {
+        archives classesJar
+        archives javadocJar
+        archives sourcesJar
+    }
+
 
     javadoc {
         options {
@@ -57,7 +65,7 @@ if (!isNoDoc) {//本地仓库不需要注释
             locale 'en_US'
             encoding 'UTF-8'
             charSet 'UTF-8'
-            links "http://docs.oracle.com/javase/7/docs/api"
+            links "http://docs.oracle.com/javase/8/docs/api"
         }
     }
 }
