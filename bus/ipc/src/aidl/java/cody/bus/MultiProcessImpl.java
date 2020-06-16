@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 18:20:30
+ * 当前修改时间：2020年06月17日 02:23:52
+ * 上次修改时间：2020年06月17日 02:10:26
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -26,12 +26,30 @@ import com.alibaba.fastjson.JSON;
 
 /**
  * 支持进程间事件总线的扩展，每个进程有一个实例
+ * aidl 实现
  */
 class MultiProcessImpl implements BusFactory.MultiProcess {
     private String mPkgName;
+    private Context mContext;
     private final String mProcessName;
     private IProcessManager mProcessManager;
-    private Context mContext;
+
+    private final IProcessCallback mProcessCallback = new IProcessCallback.Stub() {
+        @Override
+        public String processName() {
+            return mProcessName;
+        }
+
+        @Override
+        public void onPost(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, false);
+        }
+
+        @Override
+        public void onPostSticky(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, true);
+        }
+    };
 
     private MultiProcessImpl() {
         mProcessName = Application.getProcessName();
@@ -88,23 +106,6 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             e.printStackTrace();
         }
     }
-
-    private final IProcessCallback mProcessCallback = new IProcessCallback.Stub() {
-        @Override
-        public String processName() {
-            return mProcessName;
-        }
-
-        @Override
-        public void onPost(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, false);
-        }
-
-        @Override
-        public void onPostSticky(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, true);
-        }
-    };
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
