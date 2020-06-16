@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：LiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月16日 23:43:38
+ * 上次修改时间：2020年06月16日 16:23:13
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -59,13 +59,11 @@ public interface LiveDataWrapper<T> {
     void postToCurrentProcess(@NonNull T value);
 
     /**
-     * 只在当前进程 post 事件
-     * 如果在多线程中调用，保留每一个值
-     * 无需关心调用线程，只要确保在相同进程中就可以
+     * 跨进程的粘性事件支持，新建进程时，需要初始值时调用，其他情况不要使用
      *
      * @param value 需要更新的值
      */
-    void postInitValue(@NonNull T value);
+    void postStickyToCurrentProcess(@NonNull T value);
 
     /**
      * 更新事件

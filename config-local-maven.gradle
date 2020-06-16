@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-local-maven.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月16日 23:43:38
+ * 上次修改时间：2020年06月16日 23:41:27
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -11,6 +11,7 @@
  */
 apply plugin: 'maven'
 def groupId = LOCAL_GROUP_ID + '.' + this.parent.getName()
+// 普通 lib 或 aar 上传
 uploadArchives {
     repositories {
         mavenDeployer {

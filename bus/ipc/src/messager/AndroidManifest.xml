@@ -1,0 +1,33 @@
+<!--
+  ~ *************************************************************
+  ~ 文件：AndroidManifest.xml  模块：ipc  项目：ElegantBus
+  ~ 当前修改时间：2020年06月16日 23:43:38
+  ~ 上次修改时间：2020年06月16日 19:34:54
+  ~ 作者：Cody.yi   https://github.com/codyer
+  ~
+  ~ 描述：ipc
+  ~ Copyright (c) 2020
+  ~ *************************************************************
+  -->
+
+<manifest package="cody.bus.ipc"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <permission
+        android:name="cody.bus.ipc.permission"
+        android:label="bus process service permission"
+        android:protectionLevel="normal" />
+
+    <uses-permission android:name="cody.bus.ipc.permission" />
+
+    <application>
+
+        <service
+            android:name="cody.bus.ProcessManagerService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="cody.bus.ipc.permission"
+            android:process="cody.bus.ProcessManagerService" />
+    </application>
+
+</manifest>

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：StubLiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月16日 23:43:38
+ * 上次修改时间：2020年06月16日 16:23:13
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -45,7 +45,7 @@ class StubLiveDataWrapper<T> implements LiveDataWrapper<T> {
     }
 
     @Override
-    public void postInitValue(@NonNull final T value) {
+    public void postStickyToCurrentProcess(@NonNull final T value) {
 
     }
 

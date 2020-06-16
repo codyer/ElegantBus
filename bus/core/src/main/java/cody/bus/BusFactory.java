@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：BusFactory.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:30:33
+ * 当前修改时间：2020年06月16日 23:43:38
+ * 上次修改时间：2020年06月16日 16:52:10
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,15 +32,17 @@ class BusFactory {
     private final Object mLock = new Object();
     private volatile Handler mMainHandler;
     private final ExecutorService mExecutorService;
-    private final HashMap<String, GroupHolder> mGroupBus;//不同group的bus集
-
-    private MultiProcess mDelegate;
+    //不同group的bus集
+    private final Map<String, EventGroupHolder> mGroupBus;
 
     interface MultiProcess {
-        String hostName();
+        // 代理组名
+        String pkgName();
 
-        <T> void post(String group, String event, String type, T value);
+        <T> void postToService(EventWrapper eventWrapper, T value);
     }
+
+    private MultiProcess mDelegate;
 
     static void setDelegate(final MultiProcess MultiProcess) {
         ready().mDelegate = MultiProcess;
@@ -63,16 +66,16 @@ class BusFactory {
     }
 
     @NonNull
-    public <T> LiveDataWrapper<T> create(String group, String event, String type, boolean process) {
-        GroupHolder groupHolder = null;
-        if (mGroupBus.containsKey(group)) {
-            groupHolder = mGroupBus.get(group);
+    public <T> LiveDataWrapper<T> create(EventWrapper eventWrapper) {
+        EventGroupHolder eventGroupHolder = null;
+        if (mGroupBus.containsKey(eventWrapper.group)) {
+            eventGroupHolder = mGroupBus.get(eventWrapper.group);
         }
-        if (groupHolder == null) {
-            groupHolder = new GroupHolder(group, event, type, process);
-            mGroupBus.put(group, groupHolder);
+        if (eventGroupHolder == null) {
+            eventGroupHolder = new EventGroupHolder(eventWrapper);
+            mGroupBus.put(eventWrapper.group, eventGroupHolder);
         }
-        return groupHolder.getBus(group, event, type, process);
+        return eventGroupHolder.getBus(eventWrapper);
     }
 
     ExecutorService getExecutorService() {
@@ -94,25 +97,25 @@ class BusFactory {
      * 每个group一个总线集
      * 每个group是独立的，不同group之间事件不互通
      */
-    final static class GroupHolder {
-        final String group;
+    final static class EventGroupHolder {
         final HashMap<String, LiveDataWrapper<?>> eventBus = new HashMap<>();
 
-        GroupHolder(String groupName, String event, String type, final boolean process) {
-            if (!eventBus.containsKey(event)) {
-                eventBus.put(event, new ActiveLiveDataWrapper(groupName, event, type, process));
+        EventGroupHolder(EventWrapper eventWrapper) {
+            if (!eventBus.containsKey(eventWrapper.event)) {
+                eventBus.put(eventWrapper.event, new ActiveLiveDataWrapper(eventWrapper));
             }
-            group = groupName;
         }
 
         @SuppressWarnings("unchecked")
-        <T> LiveDataWrapper<T> getBus(String group, String event, String type, final boolean process) {
+        <T> LiveDataWrapper<T> getBus(EventWrapper eventWrapper) {
             LiveDataWrapper<T> bus;
-            if (eventBus.containsKey(event)) {
-                bus = (LiveDataWrapper<T>) eventBus.get(event);
+            //  一个分组不会有相同的事件名，即使类型不一样也不行，定义事件时就会报错
+            // 如果用户不使用事件定义方式，很难保证事件一致
+            if (eventBus.containsKey(eventWrapper.event)) {
+                bus = (LiveDataWrapper<T>) eventBus.get(eventWrapper.event);
             } else {
-                bus = new ActiveLiveDataWrapper<>(group, event, type, process);
-                eventBus.put(event, bus);
+                bus = new ActiveLiveDataWrapper<>(eventWrapper);
+                eventBus.put(eventWrapper.event, bus);
             }
             return bus;
         }
