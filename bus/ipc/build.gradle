@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月17日 21:57:19
- * 上次修改时间：2020年06月17日 21:56:56
+ * 当前修改时间：2020年06月17日 22:43:58
+ * 上次修改时间：2020年06月17日 22:43:18
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -11,6 +11,16 @@
  */
 
 apply plugin: 'com.android.library'
+
+//编译groovy代码时采用 UTF-8
+tasks.withType(GroovyCompile) {
+    groovyOptions.encoding = "MacRoman"
+}
+
+//编译JAVA文件时采用UTF-8
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -116,12 +126,17 @@ if (android.productFlavors.size() > 0) {
         javadocTask.classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         javadocTask.classpath += variant.javaCompileProvider.get().classpath
         javadocTask.options.addStringOption('Xdoclint:none', '-quiet')
+        javadocTask.options.addStringOption("locale", 'en_US')
+        javadocTask.options.addStringOption("encoding", 'UTF-8')
+        javadocTask.options.addStringOption("charSet", 'UTF-8')
+        javadocTask.options.addStringOption("links", 'http://docs.oracle.com/javase/8/docs/api')
         javadocTask.failOnError false
         variant.sourceSets.each {
             if (it.name == "main" || it.name == variant.flavorName) {
                 javadocTask.source += it.java.sourceFiles
             }
         }
+
         // aidl 路径
         javadocTask.source += "$buildDir/generated/aidl_source_output_dir/"
 
@@ -140,7 +155,7 @@ if (android.productFlavors.size() > 0) {
     }
 }
 if (isLocalMaven) {
-    apply from: "${project.rootDir}/config-local-aar-maven.gradle"
+    apply from: "${project.rootDir}/config-local-maven.gradle"
 } else {
     apply plugin: 'com.github.dcendents.android-maven'
     group = 'com.github.codyer'

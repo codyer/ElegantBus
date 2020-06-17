@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-local-aar-maven.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月17日 21:57:19
- * 上次修改时间：2020年06月17日 19:40:40
+ * 当前修改时间：2020年06月17日 22:43:58
+ * 上次修改时间：2020年06月17日 22:38:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -27,6 +27,7 @@ uploadArchives() {
                     addFilter(flavorName) { artifact, file ->
                         true
                     }
+/*
 
                     // 生成 source 文件
                     def sourcesJarTask = project.tasks.create "sourcesJar${variant.name.capitalize()}", Jar
@@ -43,6 +44,7 @@ uploadArchives() {
                         }
                     }
 
+*/
                     pom(flavorName).groupId = groupId
                     pom(flavorName).artifactId = this.parent.getName() + '-' + this.getName() + "-" + flavorName
                     pom(flavorName).version = rootProject.ext.componentVersion // 版本号
