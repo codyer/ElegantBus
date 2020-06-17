@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月17日 02:23:52
- * 上次修改时间：2020年06月17日 01:04:47
+ * 当前修改时间：2020年06月17日 21:57:19
+ * 上次修改时间：2020年06月17日 21:56:56
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -24,6 +24,21 @@ android {
 
     defaultPublishConfig "aidlRelease"
     flavorDimensions('ipc')
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main', 'src/main/java', 'src/main/java/']
+            aidl.srcDirs = ['src/main', 'src/main/aidl', 'src/main/aidl/']
+        }
+        aidl {
+            java.srcDirs = ['src/aidl', 'src/aidl/java', 'src/aidl/java/']
+            aidl.srcDirs = ['src/aidl', 'src/aidl/aidl', 'src/aidl/aidl/']
+        }
+        messenger {
+            java.srcDirs = ['src/messenger', 'src/messenger/java', 'src/messenger/java/']
+            aidl.srcDirs = ['src/messenger', 'src/messenger/aidl', 'src/messenger/aidl/']
+        }
+    }
 
     productFlavors {
         // 使用 aidl 实现
@@ -60,28 +75,73 @@ dependencies {
 
 if (!isNoDoc) {//本地仓库不需要注释
     // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
-    apply from: "${project.rootDir}/config-doc.gradle"
+//    apply from: "${project.rootDir}/config-variant-doc.gradle"
 }
 
+// 支持多变体打包
+if (android.productFlavors.size() > 0) {
+    android.libraryVariants.all { variant ->
+        if (variant.name.toLowerCase().contains("debug")) {
+            return
+        }
+//        println("\nbuild variant 99999999 = " + variant.name)
+        // 生成 aar 文件
+        def bundleTask = project.tasks["bundle${variant.name.capitalize()}Aar"]
+        artifacts {
+            archives(bundleTask.archivePath) {
+                classifier variant.flavorName
+                builtBy bundleTask
+                name = project.name
+            }
+        }
+
+        // 生成 source 文件
+        def sourcesJarTask = project.tasks.create "sourcesJar${variant.name.capitalize()}", Jar
+        variant.sourceSets.each {
+            if (it.name == "main" || it.name == variant.flavorName) {
+                sourcesJarTask.from it.java.sourceFiles
+            }
+        }
+
+        artifacts {
+            archives(sourcesJarTask.archivePath) {
+                classifier variant.flavorName + "-sources"
+                builtBy sourcesJarTask
+                name = project.name
+            }
+        }
+
+        // Javadoc
+        def javadocTask = project.tasks.create "javadoc${variant.name.capitalize()}", Javadoc
+        javadocTask.classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        javadocTask.classpath += variant.javaCompileProvider.get().classpath
+        javadocTask.options.addStringOption('Xdoclint:none', '-quiet')
+        javadocTask.failOnError false
+        variant.sourceSets.each {
+            if (it.name == "main" || it.name == variant.flavorName) {
+                javadocTask.source += it.java.sourceFiles
+            }
+        }
+        // aidl 路径
+        javadocTask.source += "$buildDir/generated/aidl_source_output_dir/"
+
+        def javadocJarTask = project.tasks.create "javadocJar${variant.name.capitalize()}", Jar
+
+        javadocJarTask.dependsOn(javadocTask)
+        javadocJarTask.from javadocTask.destinationDir
+
+        artifacts {
+            archives(javadocJarTask.archivePath) {
+                classifier variant.flavorName + "-javadoc"
+                builtBy javadocJarTask
+                name = project.name
+            }
+        }
+    }
+}
 if (isLocalMaven) {
     apply from: "${project.rootDir}/config-local-aar-maven.gradle"
 } else {
     apply plugin: 'com.github.dcendents.android-maven'
     group = 'com.github.codyer'
-    // 支持多变体打包
-    if (android.productFlavors.size() > 0) {
-        android.libraryVariants.all { variant ->
-            if (variant.name.toLowerCase().contains("debug")) {
-                return
-            }
-            def bundleTask = project.tasks["bundle${variant.name.capitalize()}Aar"]
-            artifacts {
-                archives(bundleTask.archivePath) {
-                    classifier variant.flavorName
-                    builtBy bundleTask
-                    name = project.name
-                }
-            }
-        }
-    }
 }

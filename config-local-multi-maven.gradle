@@ -1,0 +1,86 @@
+/*
+ * ************************************************************
+ * 文件：config-local-multi-maven.gradle  模块：ElegantBus  项目：ElegantBus
+ * 当前修改时间：2020年06月17日 21:57:19
+ * 上次修改时间：2020年06月17日 21:51:05
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus
+ * Copyright (c) 2020
+ * ************************************************************
+ */
+apply plugin: 'maven'
+def groupId = LOCAL_GROUP_ID + '.' + this.parent.getName()
+// 普通 lib 或 aar 上传
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: LOCAL_REPOSITORY) {
+                // 唯一标识（通常为模块包名，也可以任意）
+                pom.groupId = groupId
+                // 项目名称（通常为类库模块名称，也可以任意）
+                pom.artifactId = this.parent.getName() + '-' + this.getName()
+                pom.version = rootProject.ext.componentVersion // 版本号
+            }
+            /*android.variantFilter { variant ->
+                if (variant.buildType.name == 'release') {
+                    variant.flavors.each {
+                        def filterName = "ipc-" + it.name
+                        addFilter(filterName) { artifact, file ->
+//                            println("ffffffff file.name = " + file.name)
+//                            println("ffffffff name = " + it.name)
+//                            artifact.ext == 'aar'
+                            file.name.contains(it.name)
+//                            true
+                        }
+                        // 版本号
+                        pom(filterName).version = rootProject.ext.componentVersion
+                        // 唯一标识（通常为模块包名，也可以任意）
+                        pom(filterName).groupId = groupId
+                        // 项目名称（通常为类库模块名称，也可以任意）
+                        pom(filterName).artifactId = this.parent.getName() + '-' + this.getName() + '-' + (it.name)
+                        pom(filterName).dependencies.forEach { dep ->
+                            if (dep.getVersion() == "unspecified") {
+                                println("--modify the dependenies module in pom.xml--->> " + dep.getArtifactId())
+                                dep.setGroupId(groupId)
+                                dep.setVersion(rootProject.ext.componentVersion)
+                            }
+                        }
+                    }
+                }
+            }*/
+            /*// addfilter for multiple pom upload
+            addFilter("jarfileName1") { artifact, file ->
+                artifact.name == "jarfileName1"
+            }
+            addFilter("jarfileName2") { artifact, file ->
+                artifact.name == "jarfileName2"
+            }
+
+            //Creating pom files and adding the Entity
+            pom("jarfileName1").version = '1.1.1'
+            pom("jarfileName1").groupId = 'what.so.ever'
+            pom("jarfileName1").artifactId = 'jarfilename1'
+
+            pom("jarfileName2").version = '1.1.1'
+            pom("jarfileName2").groupId = 'what.so.ever'
+            pom("jarfileName2").artifactId = 'jarfilename2'
+*/
+            /*addFilter("jarfileName1") { artifact, file ->
+                artifact.name == "jarfileName1"
+            }
+            pom("jarfileName1").version = '1.1.1'
+            pom("jarfileName1").groupId = 'what.so.ever'
+            pom("jarfileName1").artifactId = 'jarfilename1'*/
+            pom.whenConfigured { pom ->
+                pom.dependencies.forEach { dep ->
+                    if (dep.getVersion() == "unspecified") {
+                        println("--modify the dependenies module in pom.xml--->> " + dep.getArtifactId())
+                        dep.setGroupId(groupId)
+                        dep.setVersion(rootProject.ext.componentVersion)
+                    }
+                }
+            }
+        }
+    }
+}
