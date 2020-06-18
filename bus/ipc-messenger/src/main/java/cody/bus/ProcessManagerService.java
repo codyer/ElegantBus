@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：ProcessManagerService.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月18日 18:03:45
- * 上次修改时间：2020年06月18日 18:03:32
+ * 文件：ProcessManagerService.java  模块：ipc-messenger  项目：ElegantBus
+ * 当前修改时间：2020年06月18日 22:57:20
+ * 上次修改时间：2020年06月18日 22:56:29
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ipc
+ * 描述：ipc-messenger
  * Copyright (c) 2020
  * ************************************************************
  */
@@ -16,6 +16,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -39,6 +40,8 @@ public class ProcessManagerService extends Service {
     public final static int MSG_ON_POST = 0x03;
     public final static int MSG_ON_POST_STICKY = 0x04;
     public final static int MSG_POST_TO_SERVICE = 0x05;
+    public final static String MSG_DATA = "MSG_DATA";
+    public final static String MSG_PROCESS_NAME = "MSG_PROCESS_NAME";
     public final static String CLASS_NAME = ProcessManagerService.class.getName();
     private final List<ProcessCallback> mRemoteCallbackList = new ArrayList<>();
     private final String mServiceProcessName;
@@ -64,7 +67,9 @@ public class ProcessManagerService extends Service {
         private void postValue(final EventWrapper eventWrapper, final int what) throws RemoteException {
             Message message = Message.obtain(null, what);
             message.replyTo = mServiceMessenger;
-            message.obj = eventWrapper;
+            Bundle data = new Bundle();
+            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
+            message.setData(data);
             messenger.send(message);
         }
     }
@@ -85,9 +90,10 @@ public class ProcessManagerService extends Service {
         @Override
         public void handleMessage(Message msg) {
             try {
+                String processName = msg.getData().getString(ProcessManagerService.MSG_PROCESS_NAME);
                 switch (msg.what) {
                     case MSG_REGISTER:
-                        ProcessCallback callback = new ProcessCallback((String) msg.obj, msg.replyTo);
+                        ProcessCallback callback = new ProcessCallback(processName, msg.replyTo);
                         mRemoteCallbackList.add(callback);
                         if (!isServiceProcess(callback)) {
                             postStickyValueToNewProcess(callback);
@@ -95,14 +101,17 @@ public class ProcessManagerService extends Service {
                         break;
                     case MSG_UNREGISTER:
                         for (ProcessCallback cb : mRemoteCallbackList) {
-                            if (cb.processName == msg.obj && cb.messenger == msg.replyTo) {
+                            if (cb.processName.equals(processName) && cb.messenger == msg.replyTo) {
                                 mRemoteCallbackList.remove(cb);
                             }
                         }
                         break;
                     case MSG_POST_TO_SERVICE:
-                        putEventToCache((EventWrapper) msg.obj);
-                        postValueToOtherProcess((EventWrapper) msg.obj);
+                        EventWrapper eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
+                        if (eventWrapper != null) {
+                            putEventToCache(eventWrapper);
+                            postValueToOtherProcess(eventWrapper);
+                        }
                         break;
                 }
             } catch (RemoteException e) {

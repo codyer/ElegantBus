@@ -13,7 +13,8 @@
             <option value="$PROJECT_DIR$/bus" />
             <option value="$PROJECT_DIR$/bus/compiler" />
             <option value="$PROJECT_DIR$/bus/core" />
-            <option value="$PROJECT_DIR$/bus/ipc" />
+            <option value="$PROJECT_DIR$/bus/ipc-aidl" />
+            <option value="$PROJECT_DIR$/bus/ipc-messenger" />
             <option value="$PROJECT_DIR$/bus/lib" />
           </set>
         </option>

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：settings.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月17日 21:57:19
- * 上次修改时间：2020年06月17日 20:31:59
+ * 当前修改时间：2020年06月18日 22:57:20
+ * 上次修改时间：2020年06月18日 22:12:01
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -10,5 +10,5 @@
  * ************************************************************
  */
 
-include ':bus', ':bus:lib', ':bus:core', ':bus:ipc', ':bus:compiler'
+include ':bus', ':bus:lib', ':bus:core', ':bus:ipc-messenger',':bus:ipc-aidl', ':bus:compiler'
 //include ':app'

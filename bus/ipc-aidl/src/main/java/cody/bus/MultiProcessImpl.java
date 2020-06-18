@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月18日 18:03:45
- * 上次修改时间：2020年06月18日 13:38:15
+ * 文件：MultiProcessImpl.java  模块：ipc-aidl  项目：ElegantBus
+ * 当前修改时间：2020年06月18日 22:57:20
+ * 上次修改时间：2020年06月18日 21:54:05
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ipc
+ * 描述：ipc-aidl
  * Copyright (c) 2020
  * ************************************************************
  */
@@ -18,10 +18,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.alibaba.fastjson.JSON;
@@ -29,63 +26,30 @@ import com.alibaba.fastjson.JSON;
 
 /**
  * 支持进程间事件总线的扩展，每个进程有一个实例
- * messenger 实现
+ * aidl 实现
  */
 class MultiProcessImpl implements BusFactory.MultiProcess {
     private String mPkgName;
     private Context mContext;
     private final String mProcessName;
-    private ProcessManager mProcessManager;
+    private IProcessManager mProcessManager;
 
-    final class ProcessManager {
-        Messenger messenger;
-
-        ProcessManager(final Messenger messenger) {
-            this.messenger = messenger;
-        }
-
-        void post(final EventWrapper eventWrapper) throws RemoteException {
-            Message message = Message.obtain(null, ProcessManagerService.MSG_POST_TO_SERVICE);
-            message.replyTo = mProcessMessenger;
-            message.obj = eventWrapper;
-            messenger.send(message);
-        }
-
-        void register() throws RemoteException {
-            doRegister(ProcessManagerService.MSG_REGISTER);
-        }
-
-        IBinder asBinder() {
-            return messenger.getBinder();
-        }
-
-        void unregister() throws RemoteException {
-            doRegister(ProcessManagerService.MSG_UNREGISTER);
-        }
-
-        private void doRegister(final int what) throws RemoteException {
-            Message message = Message.obtain(null, what);
-            message.replyTo = mProcessMessenger;
-            message.obj = mProcessName;
-            messenger.send(message);
-        }
-    }
-
-    @SuppressLint("HandlerLeak")
-    private Messenger mProcessMessenger = new Messenger(new Handler() {
+    private final IProcessCallback mProcessCallback = new IProcessCallback.Stub() {
         @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case ProcessManagerService.MSG_ON_POST:
-                    postToCurrentProcess((EventWrapper) msg.obj, false);
-                    break;
-                case ProcessManagerService.MSG_ON_POST_STICKY:
-                    postToCurrentProcess((EventWrapper) msg.obj, true);
-                    break;
-            }
-            super.handleMessage(msg);
+        public String processName() {
+            return mProcessName;
         }
-    });
+
+        @Override
+        public void onPost(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, false);
+        }
+
+        @Override
+        public void onPostSticky(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, true);
+        }
+    };
 
     private MultiProcessImpl() {
         mProcessName = Application.getProcessName();
@@ -146,9 +110,10 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mProcessManager = new ProcessManager(new Messenger(service));
+            mProcessManager = IProcessManager.Stub.asInterface(service);
+            if (mProcessManager == null) return;
             try {
-                mProcessManager.register();
+                mProcessManager.register(mProcessCallback);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -187,7 +152,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
             try {
                 // 取消注册
-                mProcessManager.unregister();
+                mProcessManager.unregister(mProcessCallback);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

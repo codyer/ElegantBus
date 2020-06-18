@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-doc.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月18日 13:38:08
- * 上次修改时间：2020年06月18日 13:37:56
+ * 当前修改时间：2020年06月18日 22:57:20
+ * 上次修改时间：2020年06月18日 21:54:05
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -58,8 +58,6 @@ artifacts {
 /*在javadoc task执行之前先添加第三方的依赖进来，否则会找不到相关的jar包*/
 afterEvaluate {
     javadoc.source += "$buildDir/generated/aidl_source_output_dir/"
-//    javadoc.source += variant.javaCompileProvider.get().source
-//    javadoc.source += compileReleaseAidl.sourceOutputDir.get().asFileTree
     javadoc.classpath += project.android.libraryVariants.toList().first().javaCompileProvider.get().classpath
 }
 
