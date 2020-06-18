@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月17日 22:43:58
- * 上次修改时间：2020年06月17日 22:43:18
+ * 当前修改时间：2020年06月18日 17:50:54
+ * 上次修改时间：2020年06月18日 17:49:23
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -41,8 +41,8 @@ android {
             aidl.srcDirs = ['src/main', 'src/main/aidl', 'src/main/aidl/']
         }
         aidl {
-            java.srcDirs = ['src/aidl', 'src/aidl/java', 'src/aidl/java/']
-            aidl.srcDirs = ['src/aidl', 'src/aidl/aidl', 'src/aidl/aidl/']
+            java.srcDirs = ['src/aidl/java', 'src/aidl/java', 'src/aidl/java/']
+            aidl.srcDirs = ['src/aidl/java', 'src/aidl/aidl', 'src/aidl/aidl/']
         }
         messenger {
             java.srcDirs = ['src/messenger', 'src/messenger/java', 'src/messenger/java/']
@@ -51,19 +51,19 @@ android {
     }
 
     productFlavors {
-        // 使用 aidl 实现
-        aidl {
-            dimension 'ipc'
-        }
         // 使用 Messenger 实现
         messenger {
+            dimension 'ipc'
+        }
+        // 使用 aidl 实现
+        aidl {
             dimension 'ipc'
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -83,10 +83,10 @@ dependencies {
     implementation rootProject.ext.dependencies["fastjson"]
 }
 
-if (!isNoDoc) {//本地仓库不需要注释
-    // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
+//if (!isNoDoc) {//本地仓库不需要注释
+// 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
 //    apply from: "${project.rootDir}/config-variant-doc.gradle"
-}
+//}
 
 // 支持多变体打包
 if (android.productFlavors.size() > 0) {
@@ -97,65 +97,145 @@ if (android.productFlavors.size() > 0) {
 //        println("\nbuild variant 99999999 = " + variant.name)
         // 生成 aar 文件
         def bundleTask = project.tasks["bundle${variant.name.capitalize()}Aar"]
-        artifacts {
-            archives(bundleTask.archivePath) {
-                classifier variant.flavorName
-                builtBy bundleTask
-                name = project.name
-            }
-        }
+//        bundleTask.archiveBaseName.set(project.parent.name)
+//        bundleTask.archiveAppendix.set(variant.flavorName)
 
         // 生成 source 文件
-        def sourcesJarTask = project.tasks.create "sourcesJar${variant.name.capitalize()}", Jar
-        variant.sourceSets.each {
+        def assembleDps = project.tasks["compile${variant.name.capitalize()}Aidl"]
+        /*def sourcesJarTask = project.tasks.create(name: "aSourcesJar${variant.name.capitalize()}", type: Jar) {
+            from android.sourceSets.main.java.srcDirs
+            from variant.sourceSets.java.sourceFiles
+            archiveBaseName.set(project.parent.name + "-" + project.name)
+            archiveAppendix.set(variant.flavorName)
+            archiveClassifier.convention('sources')
+            archiveClassifier.set('sources')
+
+//        libsDir = variant.flavorName
+//            dependsOn(compileDps)
+            *//*variant.sourceSets.each {
             if (it.name == "main" || it.name == variant.flavorName) {
+//                sourcesJarTask.from it.output
                 sourcesJarTask.from it.java.sourceFiles
             }
-        }
+        }*//*
+//        sourcesJarTask.archiveFileName.set(project.name + "-" + variant.flavorName + ".jar")
+//        println("aaaaa 1\n" + sourcesJarTask.archivePath)
+//        println("aaaaa 2\n" + file(sourcesJarTask.archiveFileName.get()))
 
-        artifacts {
-            archives(sourcesJarTask.archivePath) {
-                classifier variant.flavorName + "-sources"
-                builtBy sourcesJarTask
-                name = project.name
+        }*/
+
+        def sourcesJarTask = project.tasks.create(name: "aaSourcesJar${variant.name.capitalize()}", type: Jar, dependsOn: assembleDps) {
+            //           baseName = "abd"
+
+            archiveBaseName.set(project.parent.name + "-" + project.name + "-aiidl")
+
+
+            //archiveAppendix.set(variant.flavorName) 设置这个属性莫名文件不对
+            archiveClassifier.convention('sources')
+            archiveClassifier.set('sources')
+//            def contentSpec = copySpec {
+            from(android.sourceSets.main.java.srcDirs) {
+                exclude "*.xml"
+                exclude "java*"
             }
+            from files("$buildDir/generated/aidl_source_output_dir/$variant.name/out/")
+            variant.sourceSets.each {
+                if (it.name == variant.flavorName /*|| it.name == 'main'*/) {
+                    println("eeeeeeee = " + it.java.sourceFiles.asList())
+                    from it.java.sourceFiles
+                }
+            }
+//            }
+//    指定需要被打包成 jar 的文件夹
+//            include('/**')
+            destinationDirectory.set(project.file("$buildDir/$libsDirName/${variant.flavorName}"))
+//            destinationDir = file()
+            /* mustRunAfter assembleDps
+             from(android.sourceSets.main.java.srcDirs) {
+                 exclude "*.xml"
+             }
+             from files("$buildDir/generated/aidl_source_output_dir/$variant.name/out/")
+             variant.sourceSets.each {
+                 if (it.name == variant.flavorName) {
+                     from it.java.sourceFiles
+                 }
+             }
+             includeEmptyDirs false
+             duplicatesStrategy DuplicatesStrategy.EXCLUDE*/
+
+//            println("oooooooo source 2 = " + classpath)
+//            with(contentSpec)
+//            destinationDir()
+//            archiveDestinationDirectory.set("$buildDir/$libsDirName/${variant.flavorName}")
+//            exclude("*.xml")
+            println("oooooooo source 2 = " + source.asList())
+            /*doLast {
+                println("oooooooo source 3 = " + source.asList())
+                copy {
+//                    into "$buildDir/copy"
+                    into("$buildDir/$libsDirName/${variant.flavorName}")
+//                    with contentSpec
+                    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+                    from(destinationDirectory)
+//                    include('*.jar')
+                }
+            }*/
         }
 
         // Javadoc
-        def javadocTask = project.tasks.create "javadoc${variant.name.capitalize()}", Javadoc
-        javadocTask.classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-        javadocTask.classpath += variant.javaCompileProvider.get().classpath
-        javadocTask.options.addStringOption('Xdoclint:none', '-quiet')
-        javadocTask.options.addStringOption("locale", 'en_US')
-        javadocTask.options.addStringOption("encoding", 'UTF-8')
-        javadocTask.options.addStringOption("charSet", 'UTF-8')
-        javadocTask.options.addStringOption("links", 'http://docs.oracle.com/javase/8/docs/api')
-        javadocTask.failOnError false
-        variant.sourceSets.each {
-            if (it.name == "main" || it.name == variant.flavorName) {
-                javadocTask.source += it.java.sourceFiles
-            }
-        }
+        /*  def javadocTask = project.tasks.create(name: "aaJavadoc${variant.name.capitalize()}", type: Javadoc, dependsOn: assembleDps) {
+              source += android.sourceSets.main.java.srcDirs
+              source += variant.sourceSets.java.sourceFiles
+              // aidl 路径
+              source += "$buildDir/generated/aidl_source_output_dir/"
+              classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+              classpath += variant.javaCompileProvider.get().classpath
+              classpath += configurations.compile
+  //            println("destinationDir 1 = " + destinationDir)
+              destinationDir = file("build/docs/javadoc/" + variant.flavorName)
+  //            println("destinationDir 2 = " + destinationDir)
+              if (Jvm.current().getJavaVersion() == JavaVersion.VERSION_1_8) {
+                  options.addStringOption('Xdoclint:none', '-quiet')
+              }
+              options {
+                  // 语言
+                  locale 'en_US'
+                  encoding 'UTF-8'
+                  charSet 'UTF-8'
+                  links "http://docs.oracle.com/javase/8/docs/api"
+              }
+  //            options.addStringOption("locale", 'en_US')
+  //            options.addStringOption("encoding", 'UTF-8')
+  //            options.addStringOption("charSet", 'UTF-8')
+  //            options.addStringOption("links", 'http://docs.oracle.com/javase/8/docs/api')
+              failOnError false
+              *//*variant.sourceSets.each {
+                  if (it.name == "main" || it.name == variant.flavorName) {
+                      javadocTask.source += it.allJava
+                  }
+              }*//*
+          }
 
-        // aidl 路径
-        javadocTask.source += "$buildDir/generated/aidl_source_output_dir/"
-
-        def javadocJarTask = project.tasks.create "javadocJar${variant.name.capitalize()}", Jar
-
-        javadocJarTask.dependsOn(javadocTask)
-        javadocJarTask.from javadocTask.destinationDir
-
-        artifacts {
-            archives(javadocJarTask.archivePath) {
-                classifier variant.flavorName + "-javadoc"
-                builtBy javadocJarTask
-                name = project.name
-            }
-        }
+          def javadocJarTask = project.tasks.create(name: "aaJavadocJar${variant.name.capitalize()}", type: Jar, dependsOn: javadocTask) {
+              archiveBaseName.set(project.parent.name + "-" + project.name)
+              archiveAppendix.set(variant.flavorName)
+              archiveClassifier.convention('javadoc')
+              archiveClassifier.set('javadoc')
+              from javadocTask.destinationDir
+          }
+          artifacts {
+              archives(bundleTask.archivePath) {
+                  classifier variant.flavorName
+                  builtBy bundleTask
+                  name = project.name
+              }
+              archives sourcesJarTask
+              archives javadocJarTask
+          }*/
     }
 }
 if (isLocalMaven) {
-    apply from: "${project.rootDir}/config-local-maven.gradle"
+//    apply from: "${project.rootDir}/config-local-maven.gradle"
 } else {
     apply plugin: 'com.github.dcendents.android-maven'
     group = 'com.github.codyer'
