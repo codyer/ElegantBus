@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-versions.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月17日 21:57:19
- * 上次修改时间：2020年06月17日 18:40:09
+ * 当前修改时间：2020年06月18日 18:04:55
+ * 上次修改时间：2020年06月18日 18:03:32
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -22,8 +22,8 @@ ext {
     //libraries dependencies
     dependencies = [
             //dependencies list
-            "bus-ipc-aidl"    : "${mavenGroupId}.bus:bus-ipc:${componentVersion}",
-            "bus-ipc-messenger": "${mavenGroupId}.bus:bus-ipc-messenger:${componentVersion}",
+            "bus-ipc-well"    : "${mavenGroupId}.bus:bus-ipc:${componentVersion}",
+            "bus-ipc-best": "${mavenGroupId}.bus:bus-ipc-best:${componentVersion}",
             "bus-core"        : "${mavenGroupId}.bus:bus-core:${componentVersion}",
             "bus-compiler"    : "${mavenGroupId}.bus:bus-compiler:${componentVersion}",
 

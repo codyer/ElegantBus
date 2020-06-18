@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月18日 17:50:54
- * 上次修改时间：2020年06月18日 17:49:23
+ * 当前修改时间：2020年06月18日 18:04:55
+ * 上次修改时间：2020年06月18日 18:03:32
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -32,7 +32,7 @@ android {
         versionName rootProject.ext.versionName
     }
 
-    defaultPublishConfig "aidlRelease"
+    defaultPublishConfig "wellRelease"
     flavorDimensions('ipc')
 
     sourceSets {
@@ -40,23 +40,23 @@ android {
             java.srcDirs = ['src/main', 'src/main/java', 'src/main/java/']
             aidl.srcDirs = ['src/main', 'src/main/aidl', 'src/main/aidl/']
         }
-        aidl {
-            java.srcDirs = ['src/aidl/java', 'src/aidl/java', 'src/aidl/java/']
-            aidl.srcDirs = ['src/aidl/java', 'src/aidl/aidl', 'src/aidl/aidl/']
+        well {// 使用aidl，因为aidl这个单词有被系统硬编码的，打包使用系统服务可能出现莫名其妙问题，因此改个名字
+            java.srcDirs = ['src/well', 'src/well/java', 'src/well/java/']
+            aidl.srcDirs = ['src/well', 'src/well/aidl', 'src/well/aidl/']
         }
-        messenger {
-            java.srcDirs = ['src/messenger', 'src/messenger/java', 'src/messenger/java/']
-            aidl.srcDirs = ['src/messenger', 'src/messenger/aidl', 'src/messenger/aidl/']
+        best {
+            java.srcDirs = ['src/best', 'src/best/java', 'src/best/java/']
+            aidl.srcDirs = ['src/best', 'src/best/aidl', 'src/best/aidl/']
         }
     }
 
     productFlavors {
-        // 使用 Messenger 实现
-        messenger {
+        // 使用 aidl 实现
+        well {
             dimension 'ipc'
         }
-        // 使用 aidl 实现
-        aidl {
+        // 使用 Messenger 实现
+        best {
             dimension 'ipc'
         }
     }
