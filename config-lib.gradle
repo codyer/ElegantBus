@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-lib.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 23:05:22
+ * 当前修改时间：2020年06月18日 13:38:08
+ * 上次修改时间：2020年06月18日 08:29:29
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -29,12 +29,16 @@ task lint {}
 
 if (!isNoDoc) {//本地仓库不需要注释
     task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveBaseName.set(project.parent.name)
+        archiveAppendix.set(project.name)
         archiveClassifier.convention('sources')
         archiveClassifier.set('sources')
         from sourceSets.main.allSource
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
+        archiveBaseName.set(project.parent.name)
+        archiveAppendix.set(project.name)
         archiveClassifier.convention('javadoc')
         archiveClassifier.set('javadoc')
         from javadoc.destinationDir
