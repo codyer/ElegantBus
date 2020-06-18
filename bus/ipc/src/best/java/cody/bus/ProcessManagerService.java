@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManagerService.java  模块：ipc  项目：ElegantBus
- * 当前修改时间：2020年06月17日 02:23:52
- * 上次修改时间：2020年06月17日 02:10:26
+ * 当前修改时间：2020年06月18日 18:03:45
+ * 上次修改时间：2020年06月18日 18:03:32
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc
@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * 跨进程事件总线支持服务
+ * messenger 实现
  */
 public class ProcessManagerService extends Service {
     public final static int MSG_REGISTER = 0x01;
