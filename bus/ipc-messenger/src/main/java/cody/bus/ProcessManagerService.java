@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManagerService.java  模块：ipc-messenger  项目：ElegantBus
- * 当前修改时间：2020年06月18日 22:57:20
- * 上次修改时间：2020年06月18日 22:56:29
+ * 当前修改时间：2020年06月19日 12:19:07
+ * 上次修改时间：2020年06月19日 12:18:50
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-messenger
@@ -90,6 +90,8 @@ public class ProcessManagerService extends Service {
         @Override
         public void handleMessage(Message msg) {
             try {
+                // fix BadParcelableException: ClassNotFoundException when unmarshalling
+                msg.getData().setClassLoader(getClass().getClassLoader());
                 String processName = msg.getData().getString(ProcessManagerService.MSG_PROCESS_NAME);
                 switch (msg.what) {
                     case MSG_REGISTER:

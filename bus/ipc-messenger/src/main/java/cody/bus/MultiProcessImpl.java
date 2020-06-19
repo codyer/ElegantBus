@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc-messenger  项目：ElegantBus
- * 当前修改时间：2020年06月18日 22:57:20
- * 上次修改时间：2020年06月18日 22:56:29
+ * 当前修改时间：2020年06月19日 12:19:07
+ * 上次修改时间：2020年06月19日 12:18:50
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-messenger
@@ -33,6 +33,7 @@ import com.alibaba.fastjson.JSON;
  * messenger 实现
  */
 class MultiProcessImpl implements BusFactory.MultiProcess {
+    private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
     private final String mProcessName;
@@ -80,6 +81,8 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     private Messenger mProcessMessenger = new Messenger(new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            // fix BadParcelableException: ClassNotFoundException when unmarshalling
+            msg.getData().setClassLoader(getClass().getClassLoader());
             EventWrapper eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
             if (eventWrapper != null) {
                 switch (msg.what) {
@@ -169,7 +172,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
     };
 
-    private void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
+    private static void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
         Object value = null;
         try {
             value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
@@ -188,18 +191,22 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setComponent(new ComponentName(pkgName(), ProcessManagerService.CLASS_NAME));
         mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
     }
 
     private void unbindService() {
-        mContext.unbindService(mServiceConnection);
-        if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
-            try {
-                // 取消注册
-                mProcessManager.unregister();
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        if (mIsBound) {
+            mContext.unbindService(mServiceConnection);
+            if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
+                try {
+                    // 取消注册
+                    mProcessManager.unregister();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
+            mIsBound = false;
+            mContext = null;
         }
-        mContext = null;
     }
 }
