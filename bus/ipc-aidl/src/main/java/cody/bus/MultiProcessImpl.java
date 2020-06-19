@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc-aidl  项目：ElegantBus
- * 当前修改时间：2020年06月19日 15:08:59
- * 上次修改时间：2020年06月19日 15:07:07
+ * 当前修改时间：2020年06月19日 20:46:57
+ * 上次修改时间：2020年06月19日 18:23:50
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-aidl
@@ -66,7 +66,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             } else {
                 String mainApplicationId = info.metaData.getString("BUS_MAIN_APPLICATION_ID");
                 if (TextUtils.isEmpty(mainApplicationId)) {
-                    throw new ExceptionInInitializerError("Must config {BUS_MAIN_APPLICATION_ID} in manifestPlaceholders .");
+                    throw new RuntimeException("Must config {BUS_MAIN_APPLICATION_ID} in manifestPlaceholders .");
                 } else {
                     mPkgName = mainApplicationId;
                 }
@@ -142,8 +142,11 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setComponent(new ComponentName(pkgName(), ProcessManagerService.CLASS_NAME));
-        mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
+        mIsBound = mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        if (!mIsBound) {
+            ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
+            throw new RuntimeException("Can not find the host app under :" + pkgName());
+        }
     }
 
     private void unbindService() {

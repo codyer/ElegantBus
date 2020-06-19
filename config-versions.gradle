@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-versions.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月19日 15:08:59
- * 上次修改时间：2020年06月19日 14:29:54
+ * 当前修改时间：2020年06月19日 20:46:57
+ * 上次修改时间：2020年06月19日 20:28:51
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -17,7 +17,7 @@ ext {
     targetSdkVersion = 28
     compileSdkVersion = 28
     supportLibraryVersion = '28.0.0'
-    componentVersion = '1.4.10'
+    componentVersion = '1.4.12'
 
     //libraries dependencies
     dependencies = [
