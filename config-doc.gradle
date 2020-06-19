@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：config-doc.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月18日 22:57:20
- * 上次修改时间：2020年06月18日 21:54:05
+ * 当前修改时间：2020年06月19日 21:59:35
+ * 上次修改时间：2020年06月19日 21:59:12
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -25,8 +25,6 @@ tasks.withType(JavaCompile) {
 // 打包源码jar
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    archiveBaseName.set(project.parent.name)
-    archiveAppendix.set(project.name)
     archiveClassifier.convention('sources')
     archiveClassifier.set('sources')
 }
@@ -43,8 +41,6 @@ task javadoc(type: Javadoc) {
 
 // 打包文档jar
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveBaseName.set(project.parent.name)
-    archiveAppendix.set(project.name)
     archiveClassifier.convention('javadoc')
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
