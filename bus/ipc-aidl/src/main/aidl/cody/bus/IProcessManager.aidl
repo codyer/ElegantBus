@@ -1,8 +1,8 @@
 // IProcessManager.aidl
 package cody.bus;
 
-import cody.bus.IProcessCallback;
 import cody.bus.EventWrapper;
+import cody.bus.IProcessCallback;
 
 interface IProcessManager {
     void post(in EventWrapper eventWrapper);

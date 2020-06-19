@@ -1,8 +1,8 @@
 <!--
   ~ *************************************************************
   ~ 文件：AndroidManifest.xml  模块：ipc-aidl  项目：ElegantBus
-  ~ 当前修改时间：2020年06月18日 22:57:20
-  ~ 上次修改时间：2020年06月18日 22:34:07
+  ~ 当前修改时间：2020年06月19日 15:08:59
+  ~ 上次修改时间：2020年06月19日 14:29:54
   ~ 作者：Cody.yi   https://github.com/codyer
   ~
   ~ 描述：ipc-aidl
@@ -14,20 +14,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <permission
-        android:name="cody.bus.ipc.permission"
+        android:name="${BUS_MAIN_APPLICATION_ID}.cody.bus.ipc.permission"
         android:label="bus process service permission"
-        android:protectionLevel="normal" />
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="cody.bus.ipc.permission" />
+    <uses-permission android:name="${BUS_MAIN_APPLICATION_ID}.cody.bus.ipc.permission" />
 
     <application>
 
         <service
             android:name="cody.bus.ProcessManagerService"
             android:enabled="true"
-            android:exported="true"
-            android:permission="cody.bus.ipc.permission"
-            android:process="cody.bus.ProcessManagerService" />
+            android:exported="${BUS_SUPPORT_MULTI_APP}"
+            android:permission="${BUS_MAIN_APPLICATION_ID}.cody.bus.ipc.permission"
+            android:process="${BUS_MAIN_APPLICATION_ID}.cody.bus.ProcessManagerService" >
+            <meta-data android:name="BUS_SUPPORT_MULTI_APP" android:value="${BUS_SUPPORT_MULTI_APP}"/>
+            <meta-data android:name="BUS_MAIN_APPLICATION_ID" android:value="${BUS_MAIN_APPLICATION_ID}"/>
+        </service>
     </application>
 
 </manifest>

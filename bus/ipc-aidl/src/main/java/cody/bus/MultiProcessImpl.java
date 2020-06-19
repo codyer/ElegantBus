@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc-aidl  项目：ElegantBus
- * 当前修改时间：2020年06月19日 12:19:07
- * 上次修改时间：2020年06月19日 10:48:09
+ * 当前修改时间：2020年06月19日 15:08:59
+ * 上次修改时间：2020年06月19日 15:07:07
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-aidl
@@ -12,14 +12,16 @@
 
 package cody.bus;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 
@@ -35,35 +37,15 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     private final String mProcessName;
     private IProcessManager mProcessManager;
 
-    private final IProcessCallback mProcessCallback = new IProcessCallback.Stub() {
-        @Override
-        public String processName() {
-            return mProcessName;
-        }
-
-        @Override
-        public void onPost(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, false);
-        }
-
-        @Override
-        public void onPostSticky(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, true);
-        }
-    };
-
     private MultiProcessImpl() {
         mProcessName = Application.getProcessName();
-        BusFactory.setDelegate(this);
     }
 
-    private final static class InstanceHolder {
-        @SuppressLint("StaticFieldLeak")
-        static final MultiProcessImpl INSTANCE = new MultiProcessImpl();
-    }
-
-    private static MultiProcessImpl ready() {
-        return InstanceHolder.INSTANCE;
+    static BusFactory.MultiProcess ready() {
+        if (BusFactory.getDelegate() == null) {
+            BusFactory.setDelegate(new MultiProcessImpl());
+        }
+        return BusFactory.getDelegate();
     }
 
     /**
@@ -71,22 +53,37 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
      * 多应用且多进程场景请使用
      *
      * @param context 上下文
-     * @param pkgName 共享服务且常驻的包名
-     *                如果是单应用，即为应用的包名
-     *                如果是多个应用，即为常驻的主应用的包名
-     *                主应用必须安装，否则不能正常运行
      */
-    static void support(Context context, String pkgName) {
-        ready().mContext = context;
-        ready().mPkgName = pkgName;
-        ready().bindService();
+    @Override
+    public void support(Context context) {
+        mContext = context;
+        try {
+            ComponentName cn = new ComponentName(context, ProcessManagerService.class);
+            ServiceInfo info = context.getPackageManager().getServiceInfo(cn, PackageManager.GET_META_DATA);
+            boolean supportMultiApp = info.metaData.getBoolean("BUS_SUPPORT_MULTI_APP", false);
+            if (!supportMultiApp) {
+                mPkgName = context.getPackageName();
+            } else {
+                String mainApplicationId = info.metaData.getString("BUS_MAIN_APPLICATION_ID");
+                if (TextUtils.isEmpty(mainApplicationId)) {
+                    throw new ExceptionInInitializerError("Must config {BUS_MAIN_APPLICATION_ID} in manifestPlaceholders .");
+                } else {
+                    mPkgName = mainApplicationId;
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        bindService();
     }
 
     /**
      * 进程结束时调用，一般在 Application 的 onTerminate 中调用
      */
-    static void stopSupport() {
-        ready().unbindService();
+    @Override
+    public void stopSupport() {
+        unbindService();
     }
 
     @Override
@@ -164,4 +161,21 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             mContext = null;
         }
     }
+
+    private final IProcessCallback mProcessCallback = new IProcessCallback.Stub() {
+        @Override
+        public String processName() {
+            return mProcessName;
+        }
+
+        @Override
+        public void onPost(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, false);
+        }
+
+        @Override
+        public void onPostSticky(final EventWrapper eventWrapper) {
+            postToCurrentProcess(eventWrapper, true);
+        }
+    };
 }

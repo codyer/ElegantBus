@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：BusFactory.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 16:52:10
+ * 当前修改时间：2020年06月19日 15:08:59
+ * 上次修改时间：2020年06月19日 15:07:07
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -13,6 +13,7 @@
 package cody.bus;
 
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,9 +37,34 @@ class BusFactory {
     private final Map<String, EventGroupHolder> mGroupBus;
 
     interface MultiProcess {
-        // 代理组名
+
+        /**
+         * 进程创建时调用，一般在 Application 的 onCreate 中调用
+         * 多应用且多进程场景请使用
+         *
+         * @param context 上下文
+         */
+        void support(Context context);
+
+        /**
+         * 进程结束时调用，一般在 Application 的 onTerminate 中调用
+         */
+        void stopSupport();
+
+        /**
+         * 代理组名
+         *
+         * @return 主应用包名
+         */
         String pkgName();
 
+        /**
+         * 发送数据到主服务
+         *
+         * @param eventWrapper 事件包装类
+         * @param value        事件新值
+         * @param <T>          值类型
+         */
         <T> void postToService(EventWrapper eventWrapper, T value);
     }
 
