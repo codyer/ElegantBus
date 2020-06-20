@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ActiveLiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 16:52:10
+ * 当前修改时间：2020年06月20日 19:39:36
+ * 上次修改时间：2020年06月20日 18:30:55
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -135,7 +135,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * @param observerWrapper 观察者包装类
      */
     public void observeForever(@NonNull final ObserverWrapper<T> observerWrapper) {
-        observerWrapper.sequence = mSequence++;
+        observerWrapper.sequence = observerWrapper.sticky ? -1 : mSequence++;
         checkThread(() -> mMutableLiveData.observeForever(filterObserver(observerWrapper)));
     }
 
@@ -148,8 +148,8 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * @see #observe(LifecycleOwner, ObserverWrapper)
      */
     public void observeSticky(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
-        observerWrapper.sequence = -1;
-        checkThread(() -> mMutableLiveData.observe(owner, filterObserver(observerWrapper)));
+        observerWrapper.sticky = true;
+        observe(owner, observerWrapper);
     }
 
     /**
