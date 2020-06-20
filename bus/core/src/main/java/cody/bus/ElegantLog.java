@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ElegantLog.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 15:53:11
+ * 当前修改时间：2020年06月20日 17:34:58
+ * 上次修改时间：2020年06月20日 17:32:09
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -23,6 +23,10 @@ public final class ElegantLog {
 
     static void setDebug(final boolean debug) {
         ElegantLog.isDebug = debug;
+    }
+
+    public static boolean isDebug() {
+        return isDebug;
     }
 
     public static void d(String msg) {
