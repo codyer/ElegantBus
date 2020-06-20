@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ElegantBus.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 15:53:11
+ * 当前修改时间：2020年06月20日 17:46:52
+ * 上次修改时间：2020年06月20日 17:46:33
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -40,7 +40,7 @@ public class ElegantBus {
      * 所有事件以事件名为key进行观察
      * 使用此方法需要自己管理事件，重名等问题，不建议使用，建议使用注解自动生成管理类
      */
-    public static LiveDataWrapper getDefault(String event) {
+    public static LiveDataWrapper<Object> getDefault(String event) {
         return getDefault(event, Object.class);
     }
 
