@@ -7,6 +7,13 @@ ElegantBus 是一款 Android 平台，基于LivaData的消息总线框架，这�
 
 如果只是想先使用的，可以跳过，直接到跳到[使用说明](#使用说明)
 
+### 和常见LivaData实现的EventBus比较
+
+消息总线 | 使用反射 | 入侵系统包名 | 进程内Sticky | 跨进程Sticky | 跨APP Sticky | 事件可配置化 | 线程分发 | 消息分组 | 跨App安全考虑 |常驻事件Sticky
+---|---|---|---|---|---|----|---|---|---|---
+LiveEventBus | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: | :x: | :x: | :x:  | :x: |:x:
+ElegantBus | :x: | :x: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:
+
 ## 来龙去脉
 ### 自吹
 
@@ -74,16 +81,6 @@ Google官方也在 LocalBroadcastManager 的说明里面建议使用LiveData替�
 #### 挑战五 ： 兼容性，简洁性
 + 背景
 一个好的事件总线需要很好的兼容，不同事件应该有个很好的管理，不会造成冲突，事件可以进行多种配置，如某事件是否支持跨进程，是否激活，属于什么分组等等。
-
-
-### 和常见LivaData实现的EventBus比较
-
-消息总线 | 使用反射 | 入侵系统包名 | 进程内Sticky | 跨进程Sticky | 跨APP Sticky | 事件可配置化 | 线程分发 | 消息分组 | 跨App安全考虑 |常驻事件Sticky
----|---|---|---|---|---|----|---|---|---|---
-LiveEventBus | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: | :x: | :x: | :x:  | :x: |:x:
-ElegantBus | :x: | :x: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:
-
-
 
 ## 使用说明
 ### （一）ElegantBus 接入配置
