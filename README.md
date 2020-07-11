@@ -65,10 +65,11 @@ Google官方也在 LocalBroadcastManager 的说明里面建议使用LiveData替�
 
 更明显的原因是，本地广播好像并不支持跨进程~
 
-#### 挑战四 ： 跨应用（权限问题）
+#### 挑战四 ： 跨应用（权限问题以及粘性问题）
 + 背景
 跨进程相对来说还比较好实现，但是有的时候用户会有跨应用的需求，其实这个也是IPC范畴，为什么单独提出来呢？
 因为跨应用设计信息安全，权限校验问题，开放给其他应用，但是同时又要兼顾不被非法滥用。
+因为数据只是进程内共享的，跨应用时，粘性事件将失效，如果要保持和单进程一样支持粘性事件，需要做特殊处理。
 
 #### 挑战五 ： 兼容性，简洁性
 + 背景
@@ -261,4 +262,5 @@ TestScopeBus.eventInt().observe(owner, new ObserverWrapper<Integer>() {
 [老版本说明](https://github.com/codyer/ElegantBus/blob/master/README_v1.md)
 
 - 更详细说明
+如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
