@@ -259,5 +259,6 @@ TestScopeBus.eventInt().observe(owner, new ObserverWrapper<Integer>() {
 [老版本说明](https://github.com/codyer/ElegantBus/blob/master/README_v1.md)
 
 - 更详细说明
+
 如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
