@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManagerService.java  模块：ipc-messenger  项目：ElegantBus
- * 当前修改时间：2020年06月19日 12:19:07
- * 上次修改时间：2020年06月19日 12:18:50
+ * 当前修改时间：2020年07月21日 23:29:29
+ * 上次修改时间：2020年07月21日 23:29:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-messenger
@@ -13,7 +13,6 @@
 package cody.bus;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -77,7 +76,7 @@ public class ProcessManagerService extends Service {
     private Messenger mServiceMessenger = new Messenger(new ServiceHandler());
 
     public ProcessManagerService() {
-        mServiceProcessName = Application.getProcessName();
+        mServiceProcessName = ElegantBus.getProcessName();
     }
 
     @Override

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManagerService.java  模块：ipc-aidl  项目：ElegantBus
- * 当前修改时间：2020年06月18日 22:57:40
- * 上次修改时间：2020年06月18日 22:57:25
+ * 当前修改时间：2020年07月21日 23:29:29
+ * 上次修改时间：2020年07月21日 23:29:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-aidl
@@ -12,7 +12,6 @@
 
 package cody.bus;
 
-import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -37,7 +36,7 @@ public class ProcessManagerService extends Service {
     private final Map<String, EventWrapper> mEventCache = new HashMap<>();
 
     public ProcessManagerService() {
-        mServiceProcessName = Application.getProcessName();
+        mServiceProcessName = ElegantBus.getProcessName();
     }
 
     @Override

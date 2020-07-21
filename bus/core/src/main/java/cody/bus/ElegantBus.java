@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ElegantBus.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月20日 17:46:52
- * 上次修改时间：2020年06月20日 17:46:33
+ * 当前修改时间：2020年07月21日 23:29:29
+ * 上次修改时间：2020年07月21日 23:29:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -12,7 +12,12 @@
 
 package cody.bus;
 
-import android.app.Application;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import androidx.annotation.NonNull;
 
@@ -25,6 +30,7 @@ public class ElegantBus {
 
     /**
      * 日志开关
+     *
      * @param debug 是否打印日志
      */
     public static void setDebug(final boolean debug) {
@@ -72,7 +78,7 @@ public class ElegantBus {
         if (BusFactory.getDelegate() != null) {
             return getDefault(BusFactory.getDelegate().pkgName(), event, type, multiProcess);
         }
-        return getDefault(Application.getProcessName(), event, type, multiProcess);
+        return getDefault(getProcessName(), event, type, multiProcess);
     }
 
     /**
@@ -88,10 +94,38 @@ public class ElegantBus {
      * 使用此方法需要自己管理事件，重名等问题，不建议使用，建议使用注解自动生成管理类
      */
     public static <T> LiveDataWrapper<T> getDefault(String group, String event, @NonNull Class<T> type, boolean multiProcess) {
-        return BusFactory.ready().create(new EventWrapper(Application.getProcessName(), group, event, type.getName(), multiProcess));
+        return BusFactory.ready().create(new EventWrapper(getProcessName(), group, event, type.getName(), multiProcess));
     }
 
     public static <T> LiveDataWrapper<T> getStub() {
         return new StubLiveDataWrapper<>();
+    }
+
+    /**
+     * 获取当前进程名
+     *
+     * @return 进程名
+     */
+    public static String getProcessName() {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("/proc/" + android.os.Process.myPid() + "/cmdline"));
+            String processName = reader.readLine();
+            if (!TextUtils.isEmpty(processName)) {
+                processName = processName.trim();
+            }
+            return processName;
+        } catch (Throwable throwable) {
+            ElegantLog.e(Log.getStackTraceString(throwable));
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException exception) {
+                ElegantLog.e(Log.getStackTraceString(exception));
+            }
+        }
+        return "default";
     }
 }

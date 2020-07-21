@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ipc-aidl  项目：ElegantBus
- * 当前修改时间：2020年06月20日 17:34:58
- * 上次修改时间：2020年06月20日 17:32:09
+ * 当前修改时间：2020年07月21日 23:29:29
+ * 上次修改时间：2020年07月21日 23:29:02
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ipc-aidl
@@ -12,7 +12,6 @@
 
 package cody.bus;
 
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +37,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     private IProcessManager mProcessManager;
 
     private MultiProcessImpl() {
-        mProcessName = Application.getProcessName();
+        mProcessName = ElegantBus.getProcessName();
     }
 
     static BusFactory.MultiProcess ready() {
