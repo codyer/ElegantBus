@@ -155,9 +155,13 @@ ElegantBus.getDefault("EventA").post(888888);
 ElegantBus.getDefault(String group, String event, Class<T> type, boolean multiProcess);
 ```
 
+##### 以下说的激活状态指页面处于RESUMED情况
+![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gfxmophq4dj315r0g7jt7.jpg)
+
 #### 2、 接收事件
 接收事件也很简单：
 + 常规事件
+生命周期相关的事件，只有页面处于激活状态才会收到事件，如果在页面非激活状态时有事件发生，等页面激活（OnResume）时会收到事件。
 ```
 ElegantBus.getDefault("EventA").observe(this, new ObserverWrapper<Object>() {
             @Override
@@ -166,7 +170,8 @@ ElegantBus.getDefault("EventA").observe(this, new ObserverWrapper<Object>() {
             }
         });
 ```
-+ 普通事件的粘性事件
++ 粘性事件
+如果观察之前有事件发生，也可以收到事件，eg：A页面发送事件，打开B页面，B页面开始观察，用粘性事件也可以收到。
 ```
 ElegantBus.getDefault("EventA").observeSticky(this, new ObserverWrapper<Object>() {
             @Override
@@ -176,6 +181,7 @@ ElegantBus.getDefault("EventA").observeSticky(this, new ObserverWrapper<Object>(
         });
 ```
 + 常驻事件
+和生命周期无关，无论页面是否在激活状态，都可以收到事件，前提是页面已经打开了。
 ```
 ObserverWrapper<Object> foreverObserverWrapper;
 ElegantBus.getDefault("EventA").observeForever(foreverObserverWrapper = new ObserverWrapper<Object>() {
