@@ -36,7 +36,7 @@ dependencies {
 //	annotationProcessor "com.github.codyer.ElegantBus:compiler:$version"// when you need define event with apt add this line.
 }
 ```
-##### If you app is multi process follow the left two step, otherwise you can jump to [How to use](#How to use).
+##### If you app is multi process follow the left two step, otherwise you can jump to [How to use](#how-to-use).
 
 #### Step 3. in gradle of app module, add manifestPlaceholders for support multi process(App)
 ```
@@ -164,7 +164,7 @@ Then we can directly use this event bus for event management everywhere.
 + Send event
 ```
 TestScopeBus.eventInt().post(888);
-TestScopeBus.eventString().post("新字符串");
+TestScopeBus.eventString().post("new string");
 TestScopeBus.eventBean().post(new JavaBean());
 ```
 
