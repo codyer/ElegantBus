@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：StubLiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 16:23:13
+ * 当前修改时间：2020年09月13日 09:43:44
+ * 上次修改时间：2020年09月13日 09:39:57
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -14,6 +14,7 @@ package cody.bus;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
 /**
@@ -21,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner;
  * 当未激活时使用stub包装类
  */
 class StubLiveDataWrapper<T> implements LiveDataWrapper<T> {
+    T value;
 
     StubLiveDataWrapper() {
     }
@@ -35,22 +37,30 @@ class StubLiveDataWrapper<T> implements LiveDataWrapper<T> {
         return false;
     }
 
+    @Nullable
+    @Override
+    public T getValue() {
+        return value;
+    }
+
     @Override
     public void post(@NonNull final T value) {
+        this.value = value;
     }
 
     @Override
     public void postToCurrentProcess(@NonNull final T value) {
-
+        this.value = value;
     }
 
     @Override
     public void postStickyToCurrentProcess(@NonNull final T value) {
-
+        this.value = value;
     }
 
     @Override
     public void setValue(@NonNull final T value) {
+        this.value = value;
     }
 
     @Override

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：LiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 16:23:13
+ * 当前修改时间：2020年09月13日 09:43:44
+ * 上次修改时间：2020年09月13日 09:39:57
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -14,6 +14,7 @@ package cody.bus;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
 
@@ -40,6 +41,14 @@ public interface LiveDataWrapper<T> {
      * @return 是否有激活的观察者
      */
     boolean hasActiveObservers();
+
+    /**
+     * 获取最后保留的值，比如登录状态 可能会没有初始化就会没有值
+     *
+     * @return 获取最后保留的值
+     */
+    @Nullable
+    T getValue();
 
     /**
      * 如果在多线程中调用，保留每一个值

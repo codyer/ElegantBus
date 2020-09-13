@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ActiveLiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年06月20日 19:39:36
- * 上次修改时间：2020年06月20日 18:30:55
+ * 当前修改时间：2020年09月13日 09:43:44
+ * 上次修改时间：2020年09月13日 09:39:57
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：core
@@ -16,6 +16,7 @@ import android.os.Looper;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -49,6 +50,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @return 是否有观察者
      */
+    @Override
     public boolean hasObservers() {
         return mMutableLiveData.hasObservers();
     }
@@ -58,8 +60,23 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @return 是否有激活的观察者
      */
+    @Override
     public boolean hasActiveObservers() {
         return mMutableLiveData.hasActiveObservers();
+    }
+
+    /**
+     * 获取最后保留的值，比如登录状态 可能会没有初始化就会没有值
+     *
+     * @return 获取最后保留的值
+     */
+    @Nullable
+    @Override
+    public T getValue() {
+        if (mMutableLiveData.getValue() == null) {
+            return null;
+        }
+        return mMutableLiveData.getValue().value;
     }
 
     /**
@@ -68,6 +85,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param value 需要更新的值
      */
+    @Override
     public void post(@NonNull T value) {
         checkThread(() -> setValue(value));
         //转发到其他进程
@@ -87,6 +105,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param value 需要更新的值
      */
+    @Override
     public void postToCurrentProcess(@NonNull T value) {
         checkThread(() -> setValue(value));
     }
@@ -96,6 +115,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param value 需要更新的值
      */
+    @Override
     public void postStickyToCurrentProcess(@NonNull T value) {
         checkThread(() -> mMutableLiveData.setValue(new ValueWrapper<>(value, 0)));
     }
@@ -107,6 +127,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * @param value 更新事件值
      */
     @MainThread
+    @Override
     public void setValue(@NonNull T value) {
         mMutableLiveData.setValue(new ValueWrapper<>(value, mSequence));
     }
@@ -116,6 +137,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param observerWrapper 观察者包装类
      */
+    @Override
     public void removeObserver(@NonNull ObserverWrapper<T> observerWrapper) {
         checkThread(() -> mMutableLiveData.removeObserver(filterObserver(observerWrapper)));
     }
@@ -125,6 +147,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param owner 生命周期拥有者
      */
+    @Override
     public void removeObservers(@NonNull LifecycleOwner owner) {
         checkThread(() -> mMutableLiveData.removeObservers(owner));
     }
@@ -134,6 +157,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      *
      * @param observerWrapper 观察者包装类
      */
+    @Override
     public void observeForever(@NonNull final ObserverWrapper<T> observerWrapper) {
         observerWrapper.sequence = observerWrapper.sticky ? -1 : mSequence++;
         checkThread(() -> mMutableLiveData.observeForever(filterObserver(observerWrapper)));
@@ -147,6 +171,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * @param observerWrapper 观察者包装类
      * @see #observe(LifecycleOwner, ObserverWrapper)
      */
+    @Override
     public void observeSticky(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
         observerWrapper.sticky = true;
         observe(owner, observerWrapper);
@@ -159,6 +184,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * @param owner           生命周期拥有者
      * @param observerWrapper 观察者包装类
      */
+    @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
         observerWrapper.sequence = observerWrapper.sticky ? -1 : mSequence++;
         checkThread(() -> mMutableLiveData.observe(owner, filterObserver(observerWrapper)));
