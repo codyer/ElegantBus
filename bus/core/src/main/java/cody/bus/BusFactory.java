@@ -98,9 +98,16 @@ class BusFactory {
             eventGroupHolder = mGroupBus.get(eventWrapper.group);
         }
         if (eventGroupHolder == null) {
-            eventGroupHolder = new EventGroupHolder(eventWrapper);
-            mGroupBus.put(eventWrapper.group, eventGroupHolder);
+            synchronized (mGroupBus) {
+                if (mGroupBus.containsKey(eventWrapper.group)) {
+                    eventGroupHolder = mGroupBus.get(eventWrapper.group);
+                } else {
+                    eventGroupHolder = new EventGroupHolder(eventWrapper);
+                    mGroupBus.put(eventWrapper.group, eventGroupHolder);
+                }
+            }
         }
+        assert eventGroupHolder != null;
         return eventGroupHolder.getBus(eventWrapper);
     }
 
@@ -124,7 +131,7 @@ class BusFactory {
      * 每个group是独立的，不同group之间事件不互通
      */
     final static class EventGroupHolder {
-        final HashMap<String, LiveDataWrapper<?>> eventBus = new HashMap<>();
+        final Map<String, LiveDataWrapper<?>> eventBus = new HashMap<>();
 
         EventGroupHolder(EventWrapper eventWrapper) {
             if (!eventBus.containsKey(eventWrapper.event)) {
@@ -140,8 +147,14 @@ class BusFactory {
             if (eventBus.containsKey(eventWrapper.event)) {
                 bus = (LiveDataWrapper<T>) eventBus.get(eventWrapper.event);
             } else {
-                bus = new ActiveLiveDataWrapper<>(eventWrapper);
-                eventBus.put(eventWrapper.event, bus);
+                synchronized (eventBus) {
+                    if (eventBus.containsKey(eventWrapper.event)) {
+                        bus = (LiveDataWrapper<T>) eventBus.get(eventWrapper.event);
+                    } else {
+                        bus = new ActiveLiveDataWrapper<>(eventWrapper);
+                        eventBus.put(eventWrapper.event, bus);
+                    }
+                }
             }
             return bus;
         }
