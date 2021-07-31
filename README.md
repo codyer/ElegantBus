@@ -260,6 +260,7 @@ TestScopeBus.eventInt().observe(owner, new ObserverWrapper<Integer>() {
 默认事件是在主线程回调的，如果想在非主线程回调，设置 ObserverWrapper.uiTread = false，同时提供默认构造函数设置是否在UI线程回调。
 
 #### 欢迎 Star 和提交 Issue
+- 如需下载代码运行，注意替换gradle.properties 里面的对应字段 ：LOCAL_REPOSITORY=file://E://local-maven
 - 为了 ElegantBus 更好的为大家提供服务，更好的兼容性，我特意做了很多场景的测试，可能会有覆盖不到的，如果遇到问题，欢迎留言评论
 
 - 测试项目地址: [ElegantBus-example](https://github.com/codyer/ElegantBus-example)
