@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：EventInterfaceProcessor.java  模块：compiler  项目：ElegantBus
- * 当前修改时间：2020年06月15日 00:35:24
- * 上次修改时间：2020年06月15日 00:34:19
+ * 文件：EventInterfaceProcessor.java  模块：ElegantBus.bus.compiler  项目：ElegantBus
+ * 当前修改时间：2021年07月31日 23:44:24
+ * 上次修改时间：2021年07月31日 23:38:12
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：compiler
- * Copyright (c) 2020
+ * 描述：ElegantBus.bus.compiler
+ * Copyright (c) 2021
  * ************************************************************
  */
 
@@ -184,8 +184,8 @@ public class EventInterfaceProcessor extends AbstractProcessor {
             ClassName elegantBus = ClassName.bestGuess(ELEGANT_BUS_CLASS);
 
             if (infoBean.isActive() && e.isActive()) {
-                methodBuilder.addCode("return $T.getDefault($S, $S, $T.class, $L);\n",
-                        elegantBus, infoBean.getGroupName(), e.getEventName(), ClassName.bestGuess(e.getEventType()), e.isMultiProcess());
+                methodBuilder.addCode("return $T.getDefault($S, $S, " + getClassStr(eventTypeStr) + ", $L);\n",
+                        elegantBus, infoBean.getGroupName(), e.getEventName(), e.isMultiProcess());
             } else {
                 methodBuilder.addCode("return $T.getStub();\n", elegantBus);
             }
@@ -209,6 +209,24 @@ public class EventInterfaceProcessor extends AbstractProcessor {
     private String generateClassName(String className) {
         if (className != null && className.toLowerCase().endsWith(BUS.toLowerCase())) return className;
         return className + BUS;
+    }
+
+    private String getClassStr(String type) {
+        if (!type.contains("<")) {
+            return type + ".class";
+        }
+        return "(Class<" + type + ">) ((Class)" + outTypeToString(type) + ".class)";
+    }
+
+    /**
+     * 外层类
+     */
+    private String outTypeToString(String result) {
+        int end = result.indexOf("<");
+        if (end != -1) {
+            return result.substring(0, end);
+        }
+        return result;
     }
 
     private Type getType(String name) {
