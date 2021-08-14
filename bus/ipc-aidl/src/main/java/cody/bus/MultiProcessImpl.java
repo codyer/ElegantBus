@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ipc-aidl  项目：ElegantBus
- * 当前修改时间：2020年07月21日 23:29:29
- * 上次修改时间：2020年07月21日 23:29:02
+ * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-aidl  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 01:18:42
+ * 上次修改时间：2021年08月15日 01:06:31
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ipc-aidl
- * Copyright (c) 2020
+ * 描述：ElegantBus.bus.ipc-aidl
+ * Copyright (c) 2021
  * ************************************************************
  */
 
@@ -22,14 +22,11 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSON;
-
-
 /**
  * 支持进程间事件总线的扩展，每个进程有一个实例
  * aidl 实现
  */
-class MultiProcessImpl implements BusFactory.MultiProcess {
+class MultiProcessImpl implements MultiProcess {
     private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
@@ -40,7 +37,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         mProcessName = ElegantBus.getProcessName();
     }
 
-    static BusFactory.MultiProcess ready() {
+    static MultiProcess ready() {
         if (BusFactory.getDelegate() == null) {
             BusFactory.setDelegate(new MultiProcessImpl());
         }
@@ -100,8 +97,20 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             if (mProcessManager == null) {
                 bindService();
             } else {
-                eventWrapper.json = JSON.toJSONString(value);
-                mProcessManager.post(eventWrapper);
+                mProcessManager.postToService(MultiProcess.encode(eventWrapper, value));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void resetSticky(final EventWrapper eventWrapper) {
+        try {
+            if (mProcessManager == null) {
+                bindService();
+            } else {
+                mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,21 +135,6 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             ElegantLog.d("onServiceDisconnected, process = " + mProcessName);
         }
     };
-
-    private static void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
-        Object value = null;
-        try {
-            value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (value == null) return;
-        if (sticky) {
-            BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
-        } else {
-            BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
-        }
-    }
 
     private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -177,13 +171,8 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
 
         @Override
-        public void onPost(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, false);
-        }
-
-        @Override
-        public void onPostSticky(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, true);
+        public void call(final EventWrapper eventWrapper, final int what) {
+            MultiProcess.decode(eventWrapper, what);
         }
     };
 }

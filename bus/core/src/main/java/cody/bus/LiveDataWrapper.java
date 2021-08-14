@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：LiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年09月13日 09:43:44
- * 上次修改时间：2020年09月13日 09:39:57
+ * 文件：LiveDataWrapper.java  模块：ElegantBus.bus.core  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 01:18:42
+ * 上次修改时间：2021年08月14日 23:43:45
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：core
- * Copyright (c) 2020
+ * 描述：ElegantBus.bus.core
+ * Copyright (c) 2021
  * ************************************************************
  */
 
@@ -69,10 +69,20 @@ public interface LiveDataWrapper<T> {
 
     /**
      * 跨进程的粘性事件支持，新建进程时，需要初始值时调用，其他情况不要使用
-     *
      * @param value 需要更新的值
      */
     void postStickyToCurrentProcess(@NonNull T value);
+
+    /**
+     * 重置 Sticky 序列，确保这之后添加的监听，之前的值不回调
+     */
+    void resetSticky();
+
+    /**
+     * 只重置当前进程
+     * 重置 Sticky 序列，确保这之后添加的监听，之前的值不回调
+     */
+    void resetStickyToCurrentProcess();
 
     /**
      * 更新事件

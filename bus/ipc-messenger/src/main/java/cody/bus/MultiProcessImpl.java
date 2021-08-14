@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ipc-messenger  项目：ElegantBus
- * 当前修改时间：2020年07月21日 23:29:29
- * 上次修改时间：2020年07月21日 23:29:02
+ * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-messenger  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 01:18:42
+ * 上次修改时间：2021年08月15日 01:07:31
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ipc-messenger
- * Copyright (c) 2020
+ * 描述：ElegantBus.bus.ipc-messenger
+ * Copyright (c) 2021
  * ************************************************************
  */
 
@@ -27,14 +27,12 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSON;
-
 
 /**
  * 支持进程间事件总线的扩展，每个进程有一个实例
  * messenger 实现
  */
-class MultiProcessImpl implements BusFactory.MultiProcess {
+class MultiProcessImpl implements MultiProcess {
     private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
@@ -45,7 +43,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         mProcessName = ElegantBus.getProcessName();
     }
 
-    static BusFactory.MultiProcess ready() {
+    static MultiProcess ready() {
         if (BusFactory.getDelegate() == null) {
             BusFactory.setDelegate(new MultiProcessImpl());
         }
@@ -105,8 +103,20 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             if (mProcessManager == null) {
                 bindService();
             } else {
-                eventWrapper.json = JSON.toJSONString(value);
-                mProcessManager.post(eventWrapper);
+                mProcessManager.postToService(MultiProcess.encode(eventWrapper, value));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void resetSticky(final EventWrapper eventWrapper) {
+        try {
+            if (mProcessManager == null) {
+                bindService();
+            } else {
+                mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,21 +140,6 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             ElegantLog.d("onServiceDisconnected, process = " + mProcessName);
         }
     };
-
-    private static void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
-        Object value = null;
-        try {
-            value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (value == null) return;
-        if (sticky) {
-            BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
-        } else {
-            BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
-        }
-    }
 
     private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -181,53 +176,55 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             this.messenger = messenger;
         }
 
-        void post(final EventWrapper eventWrapper) throws RemoteException {
-            Message message = Message.obtain(null, ProcessManagerService.MSG_POST_TO_SERVICE);
-            message.replyTo = mProcessMessenger;
-            Bundle data = new Bundle();
-            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
-            message.setData(data);
-            messenger.send(message);
-        }
-
-        void register() throws RemoteException {
-            doRegister(ProcessManagerService.MSG_REGISTER);
-        }
-
         IBinder asBinder() {
             return messenger.getBinder();
         }
 
-        void unregister() throws RemoteException {
-            doRegister(ProcessManagerService.MSG_UNREGISTER);
+        void register() throws RemoteException {
+            sendProcessName(ProcessManagerService.MSG_REGISTER);
         }
 
-        private void doRegister(final int what) throws RemoteException {
-            Message message = Message.obtain(null, what);
-            message.replyTo = mProcessMessenger;
+        void unregister() throws RemoteException {
+            sendProcessName(ProcessManagerService.MSG_UNREGISTER);
+        }
+
+        void resetSticky(final EventWrapper eventWrapper) throws RemoteException {
+            sendWrapper(eventWrapper, ProcessManagerService.MSG_RESET_STICKY);
+        }
+
+        void postToService(final EventWrapper eventWrapper) throws RemoteException {
+            sendWrapper(eventWrapper, ProcessManagerService.MSG_POST_TO_SERVICE);
+        }
+
+        private void sendProcessName(final int msgUnregister) throws RemoteException {
             Bundle data = new Bundle();
             data.putString(ProcessManagerService.MSG_PROCESS_NAME, mProcessName);
+            send(msgUnregister, data);
+        }
+
+        private void sendWrapper(final EventWrapper eventWrapper, final int msgPostToService) throws RemoteException {
+            Bundle data = new Bundle();
+            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
+            send(msgPostToService, data);
+        }
+
+        private void send(final int what, Bundle data) throws RemoteException {
+            Message message = Message.obtain(null, what);
+            message.replyTo = mProcessMessenger;
             message.setData(data);
             messenger.send(message);
         }
     }
 
     @SuppressLint("HandlerLeak")
-    private Messenger mProcessMessenger = new Messenger(new Handler() {
+    private final Messenger mProcessMessenger = new Messenger(new Handler() {
         @Override
         public void handleMessage(Message msg) {
             // fix BadParcelableException: ClassNotFoundException when unmarshalling
             msg.getData().setClassLoader(getClass().getClassLoader());
             EventWrapper eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
             if (eventWrapper != null) {
-                switch (msg.what) {
-                    case ProcessManagerService.MSG_ON_POST:
-                        postToCurrentProcess(eventWrapper, false);
-                        break;
-                    case ProcessManagerService.MSG_ON_POST_STICKY:
-                        postToCurrentProcess(eventWrapper, true);
-                        break;
-                }
+                MultiProcess.decode(eventWrapper, msg.what);
             }
             super.handleMessage(msg);
         }

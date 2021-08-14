@@ -1,12 +1,12 @@
 /*
  * ************************************************************
- * 文件：StubLiveDataWrapper.java  模块：core  项目：ElegantBus
- * 当前修改时间：2020年09月13日 09:43:44
- * 上次修改时间：2020年09月13日 09:39:57
+ * 文件：StubLiveDataWrapper.java  模块：ElegantBus.bus.core  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 01:18:42
+ * 上次修改时间：2021年08月14日 23:52:48
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：core
- * Copyright (c) 2020
+ * 描述：ElegantBus.bus.core
+ * Copyright (c) 2021
  * ************************************************************
  */
 
@@ -55,7 +55,14 @@ class StubLiveDataWrapper<T> implements LiveDataWrapper<T> {
 
     @Override
     public void postStickyToCurrentProcess(@NonNull final T value) {
-        this.value = value;
+    }
+
+    @Override
+    public void resetSticky() {
+    }
+
+    @Override
+    public void resetStickyToCurrentProcess() {
     }
 
     @Override
