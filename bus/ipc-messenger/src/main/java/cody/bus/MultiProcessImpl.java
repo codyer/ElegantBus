@@ -113,6 +113,19 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
     }
 
+    @Override
+    public void resetSticky(final EventWrapper eventWrapper) {
+        try {
+            if (mProcessManager == null) {
+                bindService();
+            } else {
+                mProcessManager.resetSticky(eventWrapper);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -130,21 +143,6 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             ElegantLog.d("onServiceDisconnected, process = " + mProcessName);
         }
     };
-
-    private static void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
-        Object value = null;
-        try {
-            value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (value == null) return;
-        if (sticky) {
-            BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
-        } else {
-            BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
-        }
-    }
 
     private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -190,6 +188,15 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             messenger.send(message);
         }
 
+        void resetSticky(final EventWrapper eventWrapper) throws RemoteException {
+            Message message = Message.obtain(null, ProcessManagerService.MSG_RESET_STICKY);
+            message.replyTo = mProcessMessenger;
+            Bundle data = new Bundle();
+            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
+            message.setData(data);
+            messenger.send(message);
+        }
+
         void register() throws RemoteException {
             doRegister(ProcessManagerService.MSG_REGISTER);
         }
@@ -213,7 +220,7 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
     }
 
     @SuppressLint("HandlerLeak")
-    private Messenger mProcessMessenger = new Messenger(new Handler() {
+    private final Messenger mProcessMessenger = new Messenger(new Handler() {
         @Override
         public void handleMessage(Message msg) {
             // fix BadParcelableException: ClassNotFoundException when unmarshalling
@@ -222,10 +229,17 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             if (eventWrapper != null) {
                 switch (msg.what) {
                     case ProcessManagerService.MSG_ON_POST:
-                        postToCurrentProcess(eventWrapper, false);
+                        Object value = null;
+                        try {
+                            value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (value == null) return;
+                        BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
                         break;
-                    case ProcessManagerService.MSG_ON_POST_STICKY:
-                        postToCurrentProcess(eventWrapper, true);
+                    case ProcessManagerService.MSG_ON_RESET_STICKY:
+                        BusFactory.ready().create(eventWrapper).resetSticky();
                         break;
                 }
             }

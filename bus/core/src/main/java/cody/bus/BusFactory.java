@@ -66,6 +66,12 @@ class BusFactory {
          * @param <T>          值类型
          */
         <T> void postToService(EventWrapper eventWrapper, T value);
+
+        /**
+         * 重置 Sticky 序列，确保之前的值不回调
+         * @param eventWrapper 事件包装类
+         */
+        void resetSticky(EventWrapper eventWrapper);
     }
 
     private MultiProcess mDelegate;

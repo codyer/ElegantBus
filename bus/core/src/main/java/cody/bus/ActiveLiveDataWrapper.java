@@ -33,6 +33,7 @@ import androidx.lifecycle.Observer;
 @SuppressWarnings("unused")
 public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
     private int mSequence = 0;
+    private int mStickySequence = -1;
     private EventWrapper mEventWrapper;
     private final MutableLiveData<ValueWrapper<T>> mMutableLiveData;
 
@@ -111,13 +112,20 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
     }
 
     /**
-     * 跨进程的粘性事件支持，新建进程时，需要初始值时调用，其他情况不要使用
-     *
-     * @param value 需要更新的值
+     * 重置 Sticky 序列，确保之前的值不回调
      */
     @Override
-    public void postStickyToCurrentProcess(@NonNull T value) {
-        checkThread(() -> mMutableLiveData.setValue(new ValueWrapper<>(value, 0)));
+    public void resetSticky() {
+        mStickySequence = mSequence;
+        mSequence++;
+        //转发到其他进程
+        if (mEventWrapper.multiProcess) {
+            if (BusFactory.getDelegate() != null) {
+                BusFactory.getDelegate().resetSticky(mEventWrapper);
+            } else {
+                ElegantLog.w("you should use ElegantBusX to support multi process event bus.");
+            }
+        }
     }
 
     /**
@@ -159,7 +167,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void observeForever(@NonNull final ObserverWrapper<T> observerWrapper) {
-        observerWrapper.sequence = observerWrapper.sticky ? -1 : mSequence++;
+        observerWrapper.sequence = observerWrapper.sticky ? mStickySequence : mSequence++;
         checkThread(() -> mMutableLiveData.observeForever(filterObserver(observerWrapper)));
     }
 
@@ -186,7 +194,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
-        observerWrapper.sequence = observerWrapper.sticky ? -1 : mSequence++;
+        observerWrapper.sequence = observerWrapper.sticky ? mStickySequence : mSequence++;
         checkThread(() -> mMutableLiveData.observe(owner, filterObserver(observerWrapper)));
     }
 

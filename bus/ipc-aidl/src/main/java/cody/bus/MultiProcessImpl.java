@@ -108,6 +108,19 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
     }
 
+    @Override
+    public void resetSticky(final EventWrapper eventWrapper) {
+        try {
+            if (mProcessManager == null) {
+                bindService();
+            } else {
+                mProcessManager.resetSticky(eventWrapper);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -126,21 +139,6 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
             ElegantLog.d("onServiceDisconnected, process = " + mProcessName);
         }
     };
-
-    private static void postToCurrentProcess(EventWrapper eventWrapper, final boolean sticky) {
-        Object value = null;
-        try {
-            value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (value == null) return;
-        if (sticky) {
-            BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
-        } else {
-            BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
-        }
-    }
 
     private void bindService() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -177,13 +175,22 @@ class MultiProcessImpl implements BusFactory.MultiProcess {
         }
 
         @Override
-        public void onPost(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, false);
-        }
-
-        @Override
-        public void onPostSticky(final EventWrapper eventWrapper) {
-            postToCurrentProcess(eventWrapper, true);
+        public void call(final EventWrapper eventWrapper, final int what) {
+            switch (what){
+                case ProcessManagerService.MSG_ON_POST:
+                    Object value = null;
+                    try {
+                        value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (value == null) return;
+                    BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
+                    break;
+                case ProcessManagerService.MSG_ON_RESET_STICKY:
+                    BusFactory.ready().create(eventWrapper).resetSticky();
+                    break;
+            }
         }
     };
 }

@@ -54,8 +54,7 @@ class StubLiveDataWrapper<T> implements LiveDataWrapper<T> {
     }
 
     @Override
-    public void postStickyToCurrentProcess(@NonNull final T value) {
-        this.value = value;
+    public void resetSticky() {
     }
 
     @Override

@@ -24,12 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 /**
  * 跨进程事件总线支持服务
  * aidl 实现
  */
 public class ProcessManagerService extends Service {
+    public final static int MSG_ON_POST = 0x05;
+    public final static int MSG_ON_RESET_STICKY = 0x06;
     public final static String CLASS_NAME = ProcessManagerService.class.getName();
     private final RemoteCallbackList<IProcessCallback> mRemoteCallbackList = new RemoteCallbackList<>();
     private final String mServiceProcessName;
@@ -49,7 +50,13 @@ public class ProcessManagerService extends Service {
         @Override
         public void post(final EventWrapper eventWrapper) throws RemoteException {
             putEventToCache(eventWrapper);
-            postValueToOtherProcess(eventWrapper);
+            callbackToOtherProcess(eventWrapper, MSG_ON_POST);
+        }
+
+        @Override
+        public void resetSticky(final EventWrapper eventWrapper) throws RemoteException {
+            removeEventFromCache(eventWrapper);
+            callbackToOtherProcess(eventWrapper, MSG_ON_RESET_STICKY);
         }
 
         @Override
@@ -72,7 +79,7 @@ public class ProcessManagerService extends Service {
      * @param eventWrapper 发送值
      * @throws RemoteException 异常
      */
-    private void postValueToOtherProcess(EventWrapper eventWrapper) throws RemoteException {
+    private void callbackToOtherProcess(EventWrapper eventWrapper, int what) throws RemoteException {
         int count = mRemoteCallbackList.beginBroadcast();
         for (int i = 0; i < count; i++) {
             IProcessCallback callback = mRemoteCallbackList.getBroadcastItem(i);
@@ -81,7 +88,7 @@ public class ProcessManagerService extends Service {
                 ElegantLog.d("This is in same process, already posted, Event = " + eventWrapper.toString());
             } else {
                 ElegantLog.d("Post new event to other process : " + callback.processName() + ", Event = " + eventWrapper.toString());
-                callback.onPost(eventWrapper);
+                callback.call(eventWrapper, what);
             }
         }
         mRemoteCallbackList.finishBroadcast();
@@ -98,6 +105,16 @@ public class ProcessManagerService extends Service {
     }
 
     /**
+     * 服务进程收到事件先保留，作为其他进程的粘性事件缓存
+     *
+     * @param eventWrapper 消息
+     */
+    private void removeEventFromCache(final EventWrapper eventWrapper) {
+        ElegantLog.d("Service receive event, remove from cache, Event = " + eventWrapper.toString());
+        mEventCache.remove(eventWrapper.getKey());
+    }
+
+    /**
      * 转发 粘性事件到新的进程
      *
      * @param callback 进程回调
@@ -106,7 +123,7 @@ public class ProcessManagerService extends Service {
     private void postStickyValueToNewProcess(final IProcessCallback callback) throws RemoteException {
         ElegantLog.d("Post all sticky event to new process : " + callback.processName());
         for (EventWrapper item : mEventCache.values()) {
-            callback.onPostSticky(item);
+            callback.call(item, MSG_ON_POST);
         }
     }
 

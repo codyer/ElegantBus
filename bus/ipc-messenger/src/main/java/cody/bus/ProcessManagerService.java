@@ -36,34 +36,28 @@ import java.util.Map;
 public class ProcessManagerService extends Service {
     public final static int MSG_REGISTER = 0x01;
     public final static int MSG_UNREGISTER = 0x02;
-    public final static int MSG_ON_POST = 0x03;
-    public final static int MSG_ON_POST_STICKY = 0x04;
-    public final static int MSG_POST_TO_SERVICE = 0x05;
+    public final static int MSG_RESET_STICKY = 0x03;
+    public final static int MSG_POST_TO_SERVICE = 0x04;
+    public final static int MSG_ON_POST = 0x05;
+    public final static int MSG_ON_RESET_STICKY = 0x06;
     public final static String MSG_DATA = "MSG_DATA";
     public final static String MSG_PROCESS_NAME = "MSG_PROCESS_NAME";
     public final static String CLASS_NAME = ProcessManagerService.class.getName();
     private final List<ProcessCallback> mRemoteCallbackList = new ArrayList<>();
     private final String mServiceProcessName;
     private final Map<String, EventWrapper> mEventCache = new HashMap<>();
+    private final Messenger mServiceMessenger = new Messenger(new ServiceHandler());
 
-    final class ProcessCallback {
+    private final class ProcessCallback {
         String processName;
         Messenger messenger;
-
-        void onPost(EventWrapper eventWrapper) throws RemoteException {
-            postValue(eventWrapper, MSG_ON_POST);
-        }
-
-        void onPostSticky(EventWrapper eventWrapper) throws RemoteException {
-            postValue(eventWrapper, MSG_ON_POST_STICKY);
-        }
 
         ProcessCallback(final String processName, final Messenger messenger) {
             this.processName = processName;
             this.messenger = messenger;
         }
 
-        private void postValue(final EventWrapper eventWrapper, final int what) throws RemoteException {
+        void call(final EventWrapper eventWrapper, final int what) throws RemoteException {
             Message message = Message.obtain(null, what);
             message.replyTo = mServiceMessenger;
             Bundle data = new Bundle();
@@ -72,8 +66,6 @@ public class ProcessManagerService extends Service {
             messenger.send(message);
         }
     }
-
-    private Messenger mServiceMessenger = new Messenger(new ServiceHandler());
 
     public ProcessManagerService() {
         mServiceProcessName = ElegantBus.getProcessName();
@@ -92,6 +84,7 @@ public class ProcessManagerService extends Service {
                 // fix BadParcelableException: ClassNotFoundException when unmarshalling
                 msg.getData().setClassLoader(getClass().getClassLoader());
                 String processName = msg.getData().getString(ProcessManagerService.MSG_PROCESS_NAME);
+                EventWrapper eventWrapper;
                 switch (msg.what) {
                     case MSG_REGISTER:
                         ProcessCallback callback = new ProcessCallback(processName, msg.replyTo);
@@ -107,11 +100,18 @@ public class ProcessManagerService extends Service {
                             }
                         }
                         break;
+                    case MSG_RESET_STICKY:
+                        eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
+                        if (eventWrapper != null) {
+                            removeEventFromCache(eventWrapper);
+                            callbackToOtherProcess(eventWrapper, MSG_ON_RESET_STICKY);
+                        }
+                        break;
                     case MSG_POST_TO_SERVICE:
-                        EventWrapper eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
+                        eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
                         if (eventWrapper != null) {
                             putEventToCache(eventWrapper);
-                            postValueToOtherProcess(eventWrapper);
+                            callbackToOtherProcess(eventWrapper, MSG_ON_POST);
                         }
                         break;
                 }
@@ -127,7 +127,7 @@ public class ProcessManagerService extends Service {
      *
      * @param eventWrapper 发送值
      */
-    private void postValueToOtherProcess(EventWrapper eventWrapper) throws RemoteException {
+    private void callbackToOtherProcess(EventWrapper eventWrapper, int what) throws RemoteException {
         int count = mRemoteCallbackList.size();
         for (int i = 0; i < count; i++) {
             ProcessCallback callback = mRemoteCallbackList.get(i);
@@ -135,8 +135,8 @@ public class ProcessManagerService extends Service {
             if (isSameProcess(callback, eventWrapper.processName)) {
                 ElegantLog.d("This is in same process, already posted, Event = " + eventWrapper.toString());
             } else {
-                ElegantLog.d("Post new event to other process : " + callback.processName + ", Event = " + eventWrapper.toString());
-                callback.onPost(eventWrapper);
+                ElegantLog.d("call back " + what + " to other process : " + callback.processName + ", Event = " + eventWrapper.toString());
+                callback.call(eventWrapper, what);
             }
         }
     }
@@ -152,6 +152,16 @@ public class ProcessManagerService extends Service {
     }
 
     /**
+     * 服务进程收到事件先保留，作为其他进程的粘性事件缓存
+     *
+     * @param eventWrapper 消息
+     */
+    private void removeEventFromCache(final EventWrapper eventWrapper) {
+        ElegantLog.d("Service receive event, remove from cache, Event = " + eventWrapper.toString());
+        mEventCache.remove(eventWrapper.getKey());
+    }
+
+    /**
      * 转发 粘性事件到新的进程
      *
      * @param callback 进程回调
@@ -160,7 +170,7 @@ public class ProcessManagerService extends Service {
     private void postStickyValueToNewProcess(final ProcessCallback callback) throws RemoteException {
         ElegantLog.d("Post all sticky event to new process : " + callback.processName);
         for (EventWrapper item : mEventCache.values()) {
-            callback.onPostSticky(item);
+            callback.call(item, MSG_ON_POST);
         }
     }
 

@@ -6,6 +6,7 @@ import cody.bus.IProcessCallback;
 
 interface IProcessManager {
     void post(in EventWrapper eventWrapper);
+    void resetSticky(in EventWrapper eventWrapper);
     void register(IProcessCallback callback);
     void unregister(IProcessCallback callback);
 }

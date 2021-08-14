@@ -68,11 +68,9 @@ public interface LiveDataWrapper<T> {
     void postToCurrentProcess(@NonNull T value);
 
     /**
-     * 跨进程的粘性事件支持，新建进程时，需要初始值时调用，其他情况不要使用
-     *
-     * @param value 需要更新的值
+     * 重置 Sticky 序列，确保之前的值不回调
      */
-    void postStickyToCurrentProcess(@NonNull T value);
+    void resetSticky();
 
     /**
      * 更新事件

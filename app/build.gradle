@@ -40,6 +40,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation rootProject.ext.dependencies["material"]
     implementation rootProject.ext.dependencies["bus-ipc-aidl"]
+//    implementation rootProject.ext.dependencies["bus-ipc-messenger"]
 //    implementation rootProject.ext.dependencies["bus-core"]
     annotationProcessor rootProject.ext.dependencies["bus-compiler"]
 }

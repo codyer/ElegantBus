@@ -270,5 +270,14 @@ TestScopeBus.eventInt().observe(owner, new ObserverWrapper<Integer>() {
 
 - 更详细说明
 
+#### 更新说明
+- 2.2.2 增加对sticky事件进行类似清空处理，此处类似是通过控制序列号，并没有实际清空，可以通过调用resetSticky，类似设置屏障，之前发送的消息将被屏蔽，后面增加的sticky观察者不会收到屏障之前的消息。
+- 2.2.1 增加对事件泛型定义的支持，eg：
+```
+@Event(value = "eventMap 泛型测试", multiProcess = true)
+Map<String, List<String>> eventMap;
+```
+- 2.2.0 稳定版本
+
 如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
