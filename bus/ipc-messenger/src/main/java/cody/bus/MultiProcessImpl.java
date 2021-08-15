@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-messenger  项目：ElegantBus
- * 当前修改时间：2021年08月15日 17:27:55
- * 上次修改时间：2021年08月15日 17:26:11
+ * 当前修改时间：2021年08月15日 17:56:45
+ * 上次修改时间：2021年08月15日 17:56:26
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.bus.ipc-messenger
@@ -152,15 +152,16 @@ class MultiProcessImpl implements MultiProcess {
 
     private synchronized void unbindService() {
         if (mIsBound) {
-            mContext.unbindService(mServiceConnection);
             if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
                 try {
                     // 取消注册
                     mProcessManager.unregister();
+                    mProcessManager.asBinder().unlinkToDeath(mDeathRecipient, 0);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
             }
+            mContext.unbindService(mServiceConnection);
             mIsBound = false;
         }
         mContext = null;
