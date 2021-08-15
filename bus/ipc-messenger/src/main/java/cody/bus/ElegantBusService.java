@@ -1,8 +1,8 @@
 /*
  * ************************************************************
- * 文件：ProcessManagerService.java  模块：ElegantBus.bus.ipc-messenger  项目：ElegantBus
- * 当前修改时间：2021年08月15日 01:18:42
- * 上次修改时间：2021年08月15日 00:15:57
+ * 文件：ElegantBusService.java  模块：ElegantBus.bus.ipc-messenger  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 17:27:55
+ * 上次修改时间：2021年08月15日 16:56:57
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.bus.ipc-messenger
@@ -23,27 +23,26 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
  * 跨进程事件总线支持服务
  * messenger 实现
  */
-public class ProcessManagerService extends Service {
+public class ElegantBusService extends Service {
     public final static int MSG_REGISTER = 0x01;
     public final static int MSG_UNREGISTER = 0x02;
     public final static int MSG_RESET_STICKY = 0x03;//进程重置sticky
     public final static int MSG_POST_TO_SERVICE = 0x04;//进程分发到service
     public final static String MSG_DATA = "MSG_DATA";
     public final static String MSG_PROCESS_NAME = "MSG_PROCESS_NAME";
-    public final static String CLASS_NAME = ProcessManagerService.class.getName();
-    private final List<ProcessCallback> mRemoteCallbackList = new ArrayList<>();
+    private final List<ProcessCallback> mRemoteCallbackList = new CopyOnWriteArrayList<>();
     private final String mServiceProcessName;
-    private final Map<String, EventWrapper> mEventCache = new HashMap<>();
+    private final Map<String, EventWrapper> mEventCache = new ConcurrentHashMap<>();
     private final Messenger mServiceMessenger = new Messenger(new ServiceHandler());
 
     private final class ProcessCallback {
@@ -59,13 +58,13 @@ public class ProcessManagerService extends Service {
             Message message = Message.obtain(null, what);
             message.replyTo = mServiceMessenger;
             Bundle data = new Bundle();
-            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
+            data.putParcelable(ElegantBusService.MSG_DATA, eventWrapper);
             message.setData(data);
             messenger.send(message);
         }
     }
 
-    public ProcessManagerService() {
+    public ElegantBusService() {
         mServiceProcessName = ElegantBus.getProcessName();
     }
 
@@ -81,7 +80,7 @@ public class ProcessManagerService extends Service {
             try {
                 // fix BadParcelableException: ClassNotFoundException when unmarshalling
                 msg.getData().setClassLoader(getClass().getClassLoader());
-                String processName = msg.getData().getString(ProcessManagerService.MSG_PROCESS_NAME);
+                String processName = msg.getData().getString(ElegantBusService.MSG_PROCESS_NAME);
                 EventWrapper eventWrapper;
                 switch (msg.what) {
                     case MSG_REGISTER:
@@ -99,14 +98,14 @@ public class ProcessManagerService extends Service {
                         }
                         break;
                     case MSG_RESET_STICKY:
-                        eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
+                        eventWrapper = msg.getData().getParcelable(ElegantBusService.MSG_DATA);
                         if (eventWrapper != null) {
                             removeEventFromCache(eventWrapper);
                             callbackToOtherProcess(eventWrapper, MultiProcess.MSG_ON_RESET_STICKY);
                         }
                         break;
                     case MSG_POST_TO_SERVICE:
-                        eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
+                        eventWrapper = msg.getData().getParcelable(ElegantBusService.MSG_DATA);
                         if (eventWrapper != null) {
                             putEventToCache(eventWrapper);
                             callbackToOtherProcess(eventWrapper, MultiProcess.MSG_ON_POST);

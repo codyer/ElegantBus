@@ -102,8 +102,9 @@ allprojects {
 def version = "2.0.0"
 dependencies {
     implementation "com.github.codyer.ElegantBus:core:$version" // 不需要跨进程时使用
-//  implementation "com.github.codyer.ElegantBus:ipc-aidl:$version" // 跨进程时使用（方式1：aidl 实现，已经包含 core）
-//  implementation "com.github.codyer.ElegantBus:ipc-messenger:$version" // 跨进程时使用（方式2：messenger 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-binder:$version" // 跨进程时使用（方式1：binder 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-aidl:$version" // 跨进程时使用（方式2：aidl 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-messenger:$version" // 跨进程时使用（方式3：messenger 实现，已经包含 core）
 //	annotationProcessor "com.github.codyer.ElegantBus:compiler:$version"// 需要事件自动管理时使用
 }
 ```
@@ -271,6 +272,7 @@ TestScopeBus.eventInt().observe(owner, new ObserverWrapper<Integer>() {
 - 更详细说明
 
 #### 更新说明
+- 2.2.3 1、新增binder多进程支持（其实Messenger是基于AIDL，AIDL是基于binder，最终都是binder，因此提供直接使用Binder方式）；2、增加服务意外死亡监听逻辑
 - 2.2.2 增加对sticky事件进行类似屏障处理，通过调用resetSticky，类似设置屏障，之前发送的消息将被屏蔽，确保后面增加的sticky观察者不会收到屏障之前的消息。但是在这之前添加的监听依然可以正常接收到之前发送的消息。
 - 2.2.1 增加对事件泛型定义的支持，eg：
 ```

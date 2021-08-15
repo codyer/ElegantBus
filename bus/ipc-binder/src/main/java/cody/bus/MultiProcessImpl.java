@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-aidl  项目：ElegantBus
+ * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-binder  项目：ElegantBus
  * 当前修改时间：2021年08月15日 17:27:55
  * 上次修改时间：2021年08月15日 17:26:11
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.bus.ipc-aidl
+ * 描述：ElegantBus.bus.ipc-binder
  * Copyright (c) 2021
  * ************************************************************
  */

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.bus.ipc-messenger  项目：ElegantBus
- * 当前修改时间：2021年08月15日 01:18:42
- * 上次修改时间：2021年08月15日 01:07:31
+ * 当前修改时间：2021年08月15日 17:27:55
+ * 上次修改时间：2021年08月15日 17:26:11
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.bus.ipc-messenger
@@ -12,7 +12,6 @@
 
 package cody.bus;
 
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -60,7 +59,7 @@ class MultiProcessImpl implements MultiProcess {
     public void support(Context context) {
         mContext = context;
         try {
-            ComponentName cn = new ComponentName(context, ProcessManagerService.class);
+            ComponentName cn = new ComponentName(context, ElegantBusService.class);
             ServiceInfo info = context.getPackageManager().getServiceInfo(cn, PackageManager.GET_META_DATA);
             boolean supportMultiApp = info.metaData.getBoolean("BUS_SUPPORT_MULTI_APP", false);
             if (!supportMultiApp) {
@@ -68,7 +67,7 @@ class MultiProcessImpl implements MultiProcess {
             } else {
                 String mainApplicationId = info.metaData.getString("BUS_MAIN_APPLICATION_ID");
                 if (TextUtils.isEmpty(mainApplicationId)) {
-                    ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
+                    ElegantLog.e("Must config {BUS_MAIN_APPLICATION_ID} in manifestPlaceholders .");
                     if (ElegantLog.isDebug()) {
                         throw new RuntimeException("Must config {BUS_MAIN_APPLICATION_ID} in manifestPlaceholders .");
                     }
@@ -100,9 +99,7 @@ class MultiProcessImpl implements MultiProcess {
     @Override
     public <T> void postToService(EventWrapper eventWrapper, T value) {
         try {
-            if (mProcessManager == null) {
-                bindService();
-            } else {
+            if (isBind()) {
                 mProcessManager.postToService(MultiProcess.encode(eventWrapper, value));
             }
         } catch (Exception e) {
@@ -113,9 +110,7 @@ class MultiProcessImpl implements MultiProcess {
     @Override
     public void resetSticky(final EventWrapper eventWrapper) {
         try {
-            if (mProcessManager == null) {
-                bindService();
-            } else {
+            if (isBind()) {
                 mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
@@ -123,11 +118,137 @@ class MultiProcessImpl implements MultiProcess {
         }
     }
 
+    private boolean isBind() {
+        if (mContext == null) {
+            return false;
+        }
+        if (mProcessManager == null) {
+            bindService();
+        }
+        return mIsBound && mProcessManager != null;
+    }
+
+    /**
+     * 为什么不直接使用如下方式bind，为什么一定要有主APP？
+     * {
+     * Intent intent = new Intent(mContext,ProcessManagerService.class);
+     * mIsBound =  mContext.bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE);
+     * }
+     * 通过mContext方式生成的 Service 每个进程独立，会造成无法实现多APP场景，多App需要绑定到同一个Service上，
+     * 因此需要一个主App，来承担 Service 生成的角色
+     */
+    private synchronized void bindService() {
+        if (mContext == null) return;
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setComponent(new ComponentName(pkgName(), ElegantBusService.class.getName()));
+        mIsBound = mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        if (!mIsBound) {
+            ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
+            if (ElegantLog.isDebug()) {
+                throw new RuntimeException("Can not find the host app under :" + pkgName());
+            }
+        }
+    }
+
+    private synchronized void unbindService() {
+        if (mIsBound) {
+            mContext.unbindService(mServiceConnection);
+            if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
+                try {
+                    // 取消注册
+                    mProcessManager.unregister();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+            mIsBound = false;
+        }
+        mContext = null;
+    }
+
+    private final IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
+        @Override
+        public void binderDied() {
+            if (mProcessManager == null) {
+                return;
+            }
+            mProcessManager.asBinder().unlinkToDeath(mDeathRecipient, 0);
+            mProcessManager = null;
+            bindService();
+        }
+    };
+
+    private static class MessengerHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            // fix BadParcelableException: ClassNotFoundException when unmarshalling
+            msg.getData().setClassLoader(getClass().getClassLoader());
+            EventWrapper eventWrapper = msg.getData().getParcelable(ElegantBusService.MSG_DATA);
+            if (eventWrapper != null) {
+                MultiProcess.decode(eventWrapper, msg.what);
+            }
+            super.handleMessage(msg);
+        }
+    }
+
+    static class ProcessManager {
+        String mProcessName;
+        Messenger mServiceMessenger;
+        Messenger mProcessMessenger;
+
+        ProcessManager(final IBinder serviceMessenger, final String processName) {
+            mServiceMessenger = new Messenger(serviceMessenger);
+            mProcessMessenger = new Messenger(new MessengerHandler());
+            mProcessName = processName;
+        }
+
+        IBinder asBinder() {
+            return mServiceMessenger.getBinder();
+        }
+
+        void register() throws RemoteException {
+            sendWithName(ElegantBusService.MSG_REGISTER);
+        }
+
+        void unregister() throws RemoteException {
+            sendWithName(ElegantBusService.MSG_UNREGISTER);
+        }
+
+        void resetSticky(final EventWrapper eventWrapper) throws RemoteException {
+            send(eventWrapper, ElegantBusService.MSG_RESET_STICKY);
+        }
+
+        void postToService(final EventWrapper eventWrapper) throws RemoteException {
+            send(eventWrapper, ElegantBusService.MSG_POST_TO_SERVICE);
+        }
+
+        private void sendWithName(final int msg) throws RemoteException {
+            Bundle data = new Bundle();
+            data.putString(ElegantBusService.MSG_PROCESS_NAME, mProcessName);
+            send(msg, data);
+        }
+
+        private void send(final EventWrapper eventWrapper, final int msgPostToService) throws RemoteException {
+            Bundle data = new Bundle();
+            data.putParcelable(ElegantBusService.MSG_DATA, eventWrapper);
+            send(msgPostToService, data);
+        }
+
+        private void send(final int what, Bundle data) throws RemoteException {
+            Message message = Message.obtain(null, what);
+            message.replyTo = mProcessMessenger;
+            message.setData(data);
+            mServiceMessenger.send(message);
+        }
+    }
+
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mProcessManager = new ProcessManager(new Messenger(service));
+            mProcessManager = new ProcessManager(service, mProcessName);
             try {
+                service.linkToDeath(mDeathRecipient, 0);
                 mProcessManager.register();
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -140,93 +261,4 @@ class MultiProcessImpl implements MultiProcess {
             ElegantLog.d("onServiceDisconnected, process = " + mProcessName);
         }
     };
-
-    private void bindService() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setComponent(new ComponentName(pkgName(), ProcessManagerService.CLASS_NAME));
-        mIsBound = mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        if (!mIsBound) {
-            ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
-            if (ElegantLog.isDebug()) {
-                throw new RuntimeException("Can not find the host app under :" + pkgName());
-            }
-        }
-    }
-
-    private void unbindService() {
-        if (mIsBound) {
-            mContext.unbindService(mServiceConnection);
-            if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
-                try {
-                    // 取消注册
-                    mProcessManager.unregister();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-            mIsBound = false;
-            mContext = null;
-        }
-    }
-
-    final class ProcessManager {
-        Messenger messenger;
-
-        ProcessManager(final Messenger messenger) {
-            this.messenger = messenger;
-        }
-
-        IBinder asBinder() {
-            return messenger.getBinder();
-        }
-
-        void register() throws RemoteException {
-            sendProcessName(ProcessManagerService.MSG_REGISTER);
-        }
-
-        void unregister() throws RemoteException {
-            sendProcessName(ProcessManagerService.MSG_UNREGISTER);
-        }
-
-        void resetSticky(final EventWrapper eventWrapper) throws RemoteException {
-            sendWrapper(eventWrapper, ProcessManagerService.MSG_RESET_STICKY);
-        }
-
-        void postToService(final EventWrapper eventWrapper) throws RemoteException {
-            sendWrapper(eventWrapper, ProcessManagerService.MSG_POST_TO_SERVICE);
-        }
-
-        private void sendProcessName(final int msgUnregister) throws RemoteException {
-            Bundle data = new Bundle();
-            data.putString(ProcessManagerService.MSG_PROCESS_NAME, mProcessName);
-            send(msgUnregister, data);
-        }
-
-        private void sendWrapper(final EventWrapper eventWrapper, final int msgPostToService) throws RemoteException {
-            Bundle data = new Bundle();
-            data.putParcelable(ProcessManagerService.MSG_DATA, eventWrapper);
-            send(msgPostToService, data);
-        }
-
-        private void send(final int what, Bundle data) throws RemoteException {
-            Message message = Message.obtain(null, what);
-            message.replyTo = mProcessMessenger;
-            message.setData(data);
-            messenger.send(message);
-        }
-    }
-
-    @SuppressLint("HandlerLeak")
-    private final Messenger mProcessMessenger = new Messenger(new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            // fix BadParcelableException: ClassNotFoundException when unmarshalling
-            msg.getData().setClassLoader(getClass().getClassLoader());
-            EventWrapper eventWrapper = msg.getData().getParcelable(ProcessManagerService.MSG_DATA);
-            if (eventWrapper != null) {
-                MultiProcess.decode(eventWrapper, msg.what);
-            }
-            super.handleMessage(msg);
-        }
-    });
 }

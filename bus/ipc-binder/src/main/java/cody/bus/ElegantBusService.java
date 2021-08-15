@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：ProcessManagerService.java  模块：ElegantBus.bus.ipc-aidl  项目：ElegantBus
- * 当前修改时间：2021年08月15日 01:18:42
- * 上次修改时间：2021年08月15日 01:06:31
+ * 文件：ElegantBusService.java  模块：ElegantBus.bus.ipc-binder  项目：ElegantBus
+ * 当前修改时间：2021年08月15日 17:27:55
+ * 上次修改时间：2021年08月15日 16:56:57
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.bus.ipc-aidl
+ * 描述：ElegantBus.bus.ipc-binder
  * Copyright (c) 2021
  * ************************************************************
  */
@@ -20,21 +20,20 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * 跨进程事件总线支持服务
  * aidl 实现
  */
-public class ProcessManagerService extends Service {
-    public final static String CLASS_NAME = ProcessManagerService.class.getName();
+public class ElegantBusService extends Service {
     private final RemoteCallbackList<IProcessCallback> mRemoteCallbackList = new RemoteCallbackList<>();
     private final String mServiceProcessName;
-    private final Map<String, EventWrapper> mEventCache = new HashMap<>();
+    private final Map<String, EventWrapper> mEventCache = new ConcurrentHashMap<>();
 
-    public ProcessManagerService() {
+    public ElegantBusService() {
         mServiceProcessName = ElegantBus.getProcessName();
     }
 
