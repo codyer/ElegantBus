@@ -283,3 +283,6 @@ Map<String, List<String>> eventMap;
 
 如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
+
+### TODO
+跨进程使用contentProvider指定发送，去中心化，定义跨进程时需要指定送达进程包含哪些applicationId，多进程APP需要指明：other
