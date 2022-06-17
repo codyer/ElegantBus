@@ -286,3 +286,7 @@ Map<String, List<String>> eventMap;
 
 ### TODO
 跨进程使用contentProvider指定发送，去中心化，定义跨进程时需要指定送达进程包含哪些applicationId，多进程APP需要指明：other
+- 优先级逻辑
+1）、默认优先级未0，值越大，优先级越高，高优先级先收到消息
+2）、高优先级可以阻断消息传送
+3）、移出粘性事件
