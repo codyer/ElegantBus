@@ -1,18 +1,23 @@
 /*
  * ************************************************************
  * 文件：ActiveLiveDataWrapper.java  模块：ElegantBus.bus.core  项目：ElegantBus
- * 当前修改时间：2021年08月15日 01:18:42
- * 上次修改时间：2021年08月14日 23:52:48
+ * 当前修改时间：2022年09月11日 22:06:29
+ * 上次修改时间：2022年09月11日 21:54:45
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.bus.core
- * Copyright (c) 2021
+ * Copyright (c) 2022
  * ************************************************************
  */
 
 package cody.bus;
 
 import android.os.Looper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -35,14 +40,17 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
     private int mSequence = 0;
     private int mStickySequence = -1;
     private EventWrapper mEventWrapper;
+    private final List<ObserverWrapper<T>> mObserverWrappers;
     private final MutableLiveData<ValueWrapper<T>> mMutableLiveData;
 
     ActiveLiveDataWrapper() {
+        mObserverWrappers = new ArrayList<>();
         mMutableLiveData = new MutableLiveData<>();
     }
 
     ActiveLiveDataWrapper(final EventWrapper eventWrapper) {
         mEventWrapper = eventWrapper;
+        mObserverWrappers = new ArrayList<>();
         mMutableLiveData = new MutableLiveData<>();
     }
 
@@ -113,10 +121,11 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
 
     /**
      * 跨进程的粘性事件支持，新建进程时，需要初始值时调用，其他情况不要使用
+     *
      * @param value 需要更新的值
      */
     @Override
-    public void postStickyToCurrentProcess(@NonNull T value){
+    public void postStickyToCurrentProcess(@NonNull T value) {
         checkThread(() -> mMutableLiveData.setValue(new ValueWrapper<>(value, 0)));
     }
 
@@ -141,7 +150,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      * 重置 Sticky 序列，确保这之后添加的监听，之前的值不回调
      */
     @Override
-    public void resetStickyToCurrentProcess(){
+    public void resetStickyToCurrentProcess() {
         mStickySequence = mSequence;
         mSequence++;
     }
@@ -165,7 +174,10 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void removeObserver(@NonNull ObserverWrapper<T> observerWrapper) {
-        checkThread(() -> mMutableLiveData.removeObserver(filterObserver(observerWrapper)));
+        checkThread(() -> {
+            mObserverWrappers.remove(observerWrapper);
+            mMutableLiveData.removeObserver(observerWrapper.observer);
+        });
     }
 
     /**
@@ -175,7 +187,16 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void removeObservers(@NonNull LifecycleOwner owner) {
-        checkThread(() -> mMutableLiveData.removeObservers(owner));
+        checkThread(() -> {
+            Iterator<ObserverWrapper<T>> iterator = mObserverWrappers.iterator();
+            while (iterator.hasNext()) {
+                ObserverWrapper<T> next = iterator.next();
+                if (next.owner == owner) {
+                    iterator.remove();
+                }
+            }
+            mMutableLiveData.removeObservers(owner);
+        });
     }
 
     /**
@@ -185,8 +206,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void observeForever(@NonNull final ObserverWrapper<T> observerWrapper) {
-        observerWrapper.sequence = observerWrapper.sticky ? mStickySequence : mSequence++;
-        checkThread(() -> mMutableLiveData.observeForever(filterObserver(observerWrapper)));
+        checkThread(() -> insertObserver(null, observerWrapper));
     }
 
     /**
@@ -212,8 +232,32 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
      */
     @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
+        checkThread(() -> insertObserver(owner, observerWrapper));
+    }
+
+    private void insertObserver(LifecycleOwner owner, @NonNull ObserverWrapper<T> observerWrapper) {
         observerWrapper.sequence = observerWrapper.sticky ? mStickySequence : mSequence++;
-        checkThread(() -> mMutableLiveData.observe(owner, filterObserver(observerWrapper)));
+        observerWrapper.owner = owner;
+        Observer<ValueWrapper<T>> observer = filterObserver(observerWrapper);
+        int i = mObserverWrappers.size();
+        for (; i > 0; i--) {
+            ObserverWrapper<T> previous = mObserverWrappers.get(i - 1);
+            if (observerWrapper.priority > previous.priority) {
+                previous.sequence = mSequence++;
+                mMutableLiveData.removeObserver(previous.observer);
+            } else {
+                break;
+            }
+        }
+        mObserverWrappers.add(i, observerWrapper);
+        for (; i < mObserverWrappers.size(); i++) {
+            ObserverWrapper<T> next = mObserverWrappers.get(i);
+            if (next.owner == null) {
+                mMutableLiveData.observeForever(next.observer);
+            } else {
+                mMutableLiveData.observe(next.owner, next.observer);
+            }
+        }
     }
 
     /**
