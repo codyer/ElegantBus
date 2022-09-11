@@ -1,0 +1,19 @@
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：ElegantBus.compiler  项目：ElegantBus
+ * 当前修改时间：2022年09月12日 18:21:43
+ * 上次修改时间：2022年09月12日 18:03:59
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus.compiler
+ * Copyright (c) 2022
+ * ************************************************************
+ */
+
+apply from: "${project.rootDir}/config-jar.gradle"
+dependencies {
+    implementation project(':lib')
+    implementation 'com.squareup:javapoet:1.11.1'
+    implementation 'com.google.auto.service:auto-service:1.0-rc6'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc6'
+}

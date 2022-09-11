@@ -1,0 +1,13 @@
+<!--
+  ~ *************************************************************
+  ~ 文件：AndroidManifest.xml  模块：ElegantBus.core.main  项目：ElegantBus
+  ~ 当前修改时间：2022年09月12日 17:58:58
+  ~ 上次修改时间：2022年09月12日 17:47:29
+  ~ 作者：Cody.yi   https://github.com/codyer
+  ~
+  ~ 描述：ElegantBus.core.main
+  ~ Copyright (c) 2022
+  ~ *************************************************************
+  -->
+
+<manifest package="cody.bus.core" />

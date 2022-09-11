@@ -1,0 +1,17 @@
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：ElegantBus.ipc-binder  项目：ElegantBus
+ * 当前修改时间：2022年09月12日 17:58:58
+ * 上次修改时间：2022年09月12日 17:47:29
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus.ipc-binder
+ * Copyright (c) 2022
+ * ************************************************************
+ */
+
+apply from: "${project.rootDir}/config-aar.gradle"
+
+dependencies {
+    api project(':core')
+}

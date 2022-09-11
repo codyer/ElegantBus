@@ -1,50 +1,29 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月15日 14:54:49
- * 上次修改时间：2020年06月15日 14:27:28
+ * 当前修改时间：2022年09月12日 18:21:43
+ * 上次修改时间：2022年09月12日 18:21:14
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
- * Copyright (c) 2020
+ * Copyright (c) 2022
  * ************************************************************
  */
 
-import java.util.function.Consumer
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from: "config-define.gradle"
-apply from: "config-versions.gradle"
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
-        // 使用github仓库代码
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-    }
+plugins {
+    id 'com.android.application' version '7.2.2' apply false
+    id 'com.android.library' version '7.2.2' apply false
 }
 
-allprojects {
-    repositories {
-        //本地Maven仓库地址
-        maven {
-            url LOCAL_REPOSITORY
-        }
-        maven { url 'https://jitpack.io' }
-        google()
-        jcenter()
-    }
+ext {
+    version = "2.3.0"
+    groupId = 'com.github.codyer.ElegantBus'
+    minSdkVersion = 21
+    targetSdkVersion = 32
+    compileSdkVersion = 32
 }
 
 task clean(type: Delete) {
-    getSubprojects().forEach(new Consumer<Project>() {
-        @Override
-        void accept(final Project project) {
-            delete project.buildDir
-        }
-    })
     delete rootProject.buildDir
 }

@@ -1,0 +1,43 @@
+/*
+ * ************************************************************
+ * 文件：config-jar.gradle  模块：ElegantBus  项目：ElegantBus
+ * 当前修改时间：2022年09月12日 18:21:43
+ * 上次修改时间：2022年09月12日 18:20:05
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus
+ * Copyright (c) 2022
+ * ************************************************************
+ */
+
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    if (!SIMPLIFY_VERSION) {
+        withSourcesJar()
+        withJavadocJar()
+    }
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.java
+                groupId = rootProject.ext.groupId
+                artifactId = project.getName()
+                version = rootProject.ext.version
+            }
+        }
+    }
+}

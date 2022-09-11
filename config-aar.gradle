@@ -1,55 +1,59 @@
 /*
  * ************************************************************
  * 文件：config-aar.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2020年06月16日 23:43:38
- * 上次修改时间：2020年06月16日 22:56:48
+ * 当前修改时间：2022年09月12日 18:21:43
+ * 上次修改时间：2022年09月12日 18:20:06
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
- * Copyright (c) 2020
+ * Copyright (c) 2022
  * ************************************************************
  */
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
-        // dex突破65535的限制
-        multiDexEnabled true
-        vectorDrawables.useSupportLibrary = true
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    lintOptions {
-        abortOnError false
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    publishing {
+        singleVariant("release") {
+            // if you don't want sources/javadoc, remove these lines
+            if (!SIMPLIFY_VERSION) {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+    }
 }
 
-if (!isNoDoc) {//本地仓库不需要注释
-    // 改变版本的时候先关闭文档输出编译成功，然后再打开编译文档输出，不然会依赖出错
-    apply from: "${project.rootDir}/config-doc.gradle"
-}
-
-if (isLocalMaven) {
-    apply from: "${project.rootDir}/config-local-maven.gradle"
-} else {
-    apply plugin: 'com.github.dcendents.android-maven'
-    group = 'com.github.codyer'
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = rootProject.ext.groupId
+                artifactId = project.getName()
+                version = rootProject.ext.version
+            }
+        }
+    }
 }
