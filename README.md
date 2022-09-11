@@ -284,9 +284,12 @@ Map<String, List<String>> eventMap;
 如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
 
+- 2.3.0 
+优先级功能支持
+使用时创建 ObserverWrapper 时支持传优先级数字
++ 1）、数字越大优先级越高
++ 2）、优先级高的先收到消息
++ 3）、引用类型的数据可能被高优先级的改变
+
 ### TODO
 跨进程使用contentProvider指定发送，去中心化，定义跨进程时需要指定送达进程包含哪些applicationId，多进程APP需要指明：other
-- 优先级逻辑
-+ 1）、默认优先级未0，值越大，优先级越高，高优先级先收到消息
-+ 2）、高优先级可以阻断消息传送
-+ 3）、移出粘性事件
