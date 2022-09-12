@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：build.gradle  模块：ElegantBus  项目：ElegantBus
- * 当前修改时间：2022年09月12日 18:21:43
- * 上次修改时间：2022年09月12日 18:21:14
+ * 当前修改时间：2022年09月12日 18:48:25
+ * 上次修改时间：2022年09月12日 18:48:17
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus
@@ -17,7 +17,7 @@ plugins {
 }
 
 ext {
-    version = "2.3.0"
+    version = "2.3.1"
     groupId = 'com.github.codyer.ElegantBus'
     minSdkVersion = 21
     targetSdkVersion = 32
