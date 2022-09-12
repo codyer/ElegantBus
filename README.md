@@ -284,9 +284,9 @@ Map<String, List<String>> eventMap;
 如果想了解更多设计细节，可以参考简书上的说明：
 [如何优雅的使用LiveData实现一套EventBus（事件总线）](https://www.jianshu.com/p/79d909b6f8bd)
 
-- 2.3.0 
+- 3.0.0 
 优先级功能支持
-使用时创建 ObserverWrapper 时支持传优先级数字
+使用时创建 ObserverWrapper 时通过构造函数支持传优先级数字
 + 1）、数字越大优先级越高
 + 2）、优先级高的先收到消息
 + 3）、引用类型的数据可能被高优先级的改变
