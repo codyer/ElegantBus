@@ -22,8 +22,10 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="ElegantBus.core" target="11" />
+      <module name="ElegantBus.ipc" target="11" />
       <module name="ElegantBus.ipc-aidl" target="11" />
       <module name="ElegantBus.ipc-binder" target="11" />
+      <module name="ElegantBus.ipc-common" target="11" />
       <module name="ElegantBus.ipc-messenger" target="11" />
     </bytecodeTargetLevel>
   </component>

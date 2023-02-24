@@ -45,4 +45,4 @@ dependencyResolutionManagement {
 rootProject.name = "ElegantBus"
 include ':core'
 include ':lib', ':compiler'
-include ':ipc-messenger', ':ipc-binder', ':ipc-aidl'
+include ':ipc'

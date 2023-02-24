@@ -55,12 +55,26 @@ android {
 afterEvaluate {
     publishing {
         publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                from components.release
-                groupId = rootProject.ext.groupId
-                artifactId = project.getName()
-                version = rootProject.ext.version
+            def flavors = android.productFlavors
+            if (flavors == null || flavors.size() == 0) {
+                println("++++++++++ componentNameList : " + components*.name)
+                // Creates a Maven publication called "release".
+                release(MavenPublication) {
+                    from components.release
+                    groupId = rootProject.ext.groupId
+                    artifactId = project.getName()
+                    version = rootProject.ext.version
+                }
+            } else {
+                flavors.forEach { flavor ->
+                    println("++++++++++ productFlavors : " + flavor.name)
+                    "$flavor.name"(MavenPublication) {
+                        groupId = rootProject.ext.groupId
+                        artifactId = project.getName() + "-$flavor.name"
+                        artifact tasks.findByName("bundle${flavor.name.capitalize()}ReleaseAar")
+                        version = rootProject.ext.version
+                    }
+                }
             }
         }
     }

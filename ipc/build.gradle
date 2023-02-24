@@ -1,0 +1,48 @@
+/*
+ * ************************************************************
+ * 文件：build.gradle  模块：ElegantBus.ipc-aidl  项目：ElegantBus
+ * 当前修改时间：2022年09月12日 17:58:58
+ * 上次修改时间：2022年09月12日 17:47:29
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus.ipc-aidl
+ * Copyright (c) 2022
+ * ************************************************************
+ */
+
+apply from: "${project.rootDir}/config-aar.gradle"
+
+android {
+    flavorDimensions "ipc"
+    productFlavors {
+        aidl {
+            flavorDimensions("ipc")
+        }
+        binder {
+            flavorDimensions("ipc")
+        }
+        messenger {
+            flavorDimensions("ipc")
+        }
+    }
+}
+
+dependencies {
+    api project(':core')
+}
+/*
+afterEvaluate {
+    publishing {
+        publications {
+            android.productFlavors.forEach {flavor ->
+                println("++++++++++ productFlavors : " + flavor.name)
+                "$flavor.name"(MavenPublication) {
+                    groupId = rootProject.ext.groupId
+                    artifactId = project.getName() + "-$flavor.name"
+                    artifact tasks.findByName("bundle${flavor.name.capitalize()}ReleaseAar")
+                    version = rootProject.ext.version
+                }
+            }
+        }
+    }
+}*/
