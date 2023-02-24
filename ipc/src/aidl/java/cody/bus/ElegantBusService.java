@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：ElegantBusService.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年02月24日 17:46:20
- * 上次修改时间：2023年01月05日 14:27:06
+ * 文件：ElegantBusService.java  模块：ElegantBus.ipc  项目：ElegantBus
+ * 当前修改时间：2023年02月24日 18:35:16
+ * 上次修改时间：2023年02月24日 17:51:45
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc.main
+ * 描述：ElegantBus.ipc
  * Copyright (c) 2023
  * ************************************************************
  */
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 跨进程事件总线支持服务
  * aidl 实现
  */
-public class ElegantBusService extends Service {
+public class ElegantBusService extends BaseBusService {
     private final RemoteCallbackList<IProcessCallback> mRemoteCallbackList = new RemoteCallbackList<>();
     private final String mServiceProcessName;
     private final Map<String, EventWrapper> mEventCache = new ConcurrentHashMap<>();

@@ -69,10 +69,21 @@ afterEvaluate {
                 flavors.forEach { flavor ->
                     println("++++++++++ productFlavors : " + flavor.name)
                     "$flavor.name"(MavenPublication) {
+//                        from components."${flavor.name}Release"
                         groupId = rootProject.ext.groupId
                         artifactId = project.getName() + "-$flavor.name"
                         artifact tasks.findByName("bundle${flavor.name.capitalize()}ReleaseAar")
                         version = rootProject.ext.version
+                        pom.withXml {
+                            def dependenciesNode = asNode().appendNode('dependencies')
+                            // Iterate over the api dependencies (we don't want the test ones), adding a <dependency> node for each
+                            configurations.api.allDependencies.each {
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', rootProject.ext.groupId)
+                                dependencyNode.appendNode('artifactId', it.name)
+                                dependencyNode.appendNode('version', rootProject.ext.version)
+                            }
+                        }
                     }
                 }
             }

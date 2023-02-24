@@ -30,19 +30,3 @@ android {
 dependencies {
     api project(':core')
 }
-/*
-afterEvaluate {
-    publishing {
-        publications {
-            android.productFlavors.forEach {flavor ->
-                println("++++++++++ productFlavors : " + flavor.name)
-                "$flavor.name"(MavenPublication) {
-                    groupId = rootProject.ext.groupId
-                    artifactId = project.getName() + "-$flavor.name"
-                    artifact tasks.findByName("bundle${flavor.name.capitalize()}ReleaseAar")
-                    version = rootProject.ext.version
-                }
-            }
-        }
-    }
-}*/

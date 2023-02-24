@@ -1,18 +1,17 @@
 /*
  * ************************************************************
- * 文件：ElegantBusService.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年02月24日 17:46:20
- * 上次修改时间：2023年01月05日 14:27:06
+ * 文件：ElegantBusService.java  模块：ElegantBus.ipc.main  项目：ElegantBus
+ * 当前修改时间：2023年02月24日 18:35:16
+ * 上次修改时间：2023年02月24日 18:35:12
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc
+ * 描述：ElegantBus.ipc.main
  * Copyright (c) 2023
  * ************************************************************
  */
 
 package cody.bus;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -25,10 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * 跨进程事件总线支持服务
- * aidl 实现
+ * 跨进程事件总线支持服务 binder 实现
  */
-public class ElegantBusService extends Service {
+public class ElegantBusService extends BaseBusService {
     private final RemoteCallbackList<IProcessCallback> mRemoteCallbackList = new RemoteCallbackList<>();
     private final String mServiceProcessName;
     private final Map<String, EventWrapper> mEventCache = new ConcurrentHashMap<>();
