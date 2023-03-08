@@ -9,10 +9,10 @@ ElegantBus 是一款 Android 平台，基于LivaData的消息总线框架，这�
 
 ### 和常见LivaData实现的EventBus比较
 
-消息总线 | 使用反射 | 入侵系统包名 | 进程内Sticky | 跨进程Sticky | 跨APP Sticky | 事件可配置化 | 线程分发 | 消息分组 | 跨App安全考虑 |常驻事件Sticky
+消息总线 | 去除反射 | 不入侵系统包名 | 进程内Sticky | 跨进程Sticky | 跨APP Sticky | 事件可配置化 | 线程分发 | 消息分组 | 跨App安全考虑 |常驻事件Sticky
 ---|---|---|---|---|---|----|---|---|---|---
-LiveEventBus | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x: | :x: | :x: | :x: | :x:  | :x: |:x:
-ElegantBus | :x: | :x: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:
+LiveEventBus | :x: | :x: | :white_check_mark: | :x: | :x: | :x: | :x: | :x:  | :x: |:x:
+ElegantBus | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: | :white_check_mark:
 
 ## 来龙去脉
 ### 自吹
