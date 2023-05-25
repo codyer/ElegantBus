@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年02月24日 17:46:20
- * 上次修改时间：2023年01月05日 14:27:06
+ * 当前修改时间：2023年05月25日 12:34:48
+ * 上次修改时间：2023年05月25日 12:31:15
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -23,10 +23,9 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 
 /**
- * 支持进程间事件总线的扩展，每个进程有一个实例
- * aidl 实现
+ * 支持进程间事件总线的扩展，每个进程有一个实例 aidl 实现
  */
-class MultiProcessImpl implements MultiProcess {
+public class MultiProcessImpl implements MultiProcess {
     private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
@@ -37,7 +36,7 @@ class MultiProcessImpl implements MultiProcess {
         mProcessName = ElegantBus.getProcessName();
     }
 
-    static MultiProcess ready() {
+    public static MultiProcess ready() {
         if (BusFactory.getDelegate() == null) {
             BusFactory.setDelegate(new MultiProcessImpl());
         }
@@ -45,8 +44,7 @@ class MultiProcessImpl implements MultiProcess {
     }
 
     /**
-     * 进程创建时调用，一般在 Application 的 onCreate 中调用
-     * 多应用且多进程场景请使用
+     * 进程创建时调用，一般在 Application 的 onCreate 中调用 多应用且多进程场景请使用
      *
      * @param context 上下文
      */
@@ -124,13 +122,9 @@ class MultiProcessImpl implements MultiProcess {
     }
 
     /**
-     * 为什么不直接使用如下方式bind，为什么一定要有主APP？
-     * {
-     * Intent intent = new Intent(mContext,ProcessManagerService.class);
-     * mIsBound =  mContext.bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE);
-     * }
-     * 通过mContext方式生成的 Service 每个进程独立，会造成无法实现多APP场景，多App需要绑定到同一个Service上，
-     * 因此需要一个主App，来承担 Service 生成的角色
+     * 为什么不直接使用如下方式bind，为什么一定要有主APP？ { Intent intent = new Intent(mContext,ProcessManagerService.class); mIsBound =
+     * mContext.bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE); } 通过mContext方式生成的 Service
+     * 每个进程独立，会造成无法实现多APP场景，多App需要绑定到同一个Service上， 因此需要一个主App，来承担 Service 生成的角色
      */
     private synchronized void bindService() {
         if (mContext == null) return;

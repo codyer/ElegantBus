@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：IProcessManager.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年02月24日 17:46:20
- * 上次修改时间：2023年01月05日 14:27:06
+ * 当前修改时间：2023年05月25日 12:34:48
+ * 上次修改时间：2023年05月25日 12:31:15
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -109,7 +109,7 @@ public interface IProcessManager extends IInterface {
         private static class Proxy implements IProcessManager {
             private final IBinder mRemote;
 
-            Proxy(IBinder remote) {
+            public Proxy(IBinder remote) {
                 mRemote = remote;
             }
 

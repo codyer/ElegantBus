@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年02月24日 17:46:20
- * 上次修改时间：2023年01月05日 14:27:06
+ * 当前修改时间：2023年05月25日 12:34:48
+ * 上次修改时间：2023年05月25日 12:31:15
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -26,7 +26,7 @@ import android.text.TextUtils;
  * 支持进程间事件总线的扩展，每个进程有一个实例
  * aidl 实现
  */
-class MultiProcessImpl implements MultiProcess {
+public class MultiProcessImpl implements MultiProcess {
     private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
@@ -37,7 +37,7 @@ class MultiProcessImpl implements MultiProcess {
         mProcessName = ElegantBus.getProcessName();
     }
 
-    static MultiProcess ready() {
+    public static MultiProcess ready() {
         if (BusFactory.getDelegate() == null) {
             BusFactory.setDelegate(new MultiProcessImpl());
         }
