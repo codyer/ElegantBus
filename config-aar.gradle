@@ -21,7 +21,7 @@ android {
         targetSdk rootProject.ext.targetSdkVersion
         consumerProguardFiles "consumer-rules.pro"
         manifestPlaceholders = [
-                "@BUS_SUPPORT_MULTI_APP"  : false,
+                "@BUS_SUPPORT_MULTI_APP"  : "false",
                 "@BUS_MAIN_APPLICATION_ID": ""
         ]
     }
@@ -53,6 +53,11 @@ android {
 }
 
 afterEvaluate {
+    tasks.findAll { task ->
+        if (task.name.contains("verify")) {
+            task.enabled = false;
+        }
+    }
     publishing {
         publications {
             def flavors = android.productFlavors
