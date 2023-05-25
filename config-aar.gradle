@@ -21,8 +21,8 @@ android {
         targetSdk rootProject.ext.targetSdkVersion
         consumerProguardFiles "consumer-rules.pro"
         manifestPlaceholders = [
-                BUS_SUPPORT_MULTI_APP  : false,
-                BUS_MAIN_APPLICATION_ID: ""
+                "@BUS_SUPPORT_MULTI_APP"  : false,
+                "@BUS_MAIN_APPLICATION_ID": ""
         ]
     }
 
