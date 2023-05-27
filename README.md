@@ -291,5 +291,10 @@ Map<String, List<String>> eventMap;
 + 2）、优先级高的先收到消息
 + 3）、引用类型的数据可能被高优先级的改变
 
+- 3.1.3
++ 1）、解决跨进程高gradle版本编译问题
++ 2）、优化跨进程json处理
++ 3）、优化性能
+
 ### TODO
 跨进程使用contentProvider指定发送，去中心化，定义跨进程时需要指定送达进程包含哪些applicationId，多进程APP需要指明：other
