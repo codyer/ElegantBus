@@ -1,12 +1,12 @@
 /*
  * ************************************************************
  * 文件：ElegantBus.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2022年09月12日 17:58:58
- * 上次修改时间：2022年09月12日 17:47:29
+ * 当前修改时间：2023年05月27日 12:23:16
+ * 上次修改时间：2023年05月27日 12:01:20
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
- * Copyright (c) 2022
+ * Copyright (c) 2023
  * ************************************************************
  */
 
@@ -27,6 +27,8 @@ import androidx.annotation.NonNull;
  */
 @SuppressWarnings("unused")
 public class ElegantBus {
+
+    private static String mCurrentProcessName;
 
     /**
      * 日志开关
@@ -107,14 +109,17 @@ public class ElegantBus {
      * @return 进程名
      */
     public static String getProcessName() {
+        if (!TextUtils.isEmpty(mCurrentProcessName)) {
+            return mCurrentProcessName;
+        }
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader("/proc/" + android.os.Process.myPid() + "/cmdline"));
             String processName = reader.readLine();
             if (!TextUtils.isEmpty(processName)) {
-                processName = processName.trim();
+                mCurrentProcessName = processName.trim();
             }
-            return processName;
+            return mCurrentProcessName;
         } catch (Throwable throwable) {
             ElegantLog.e(Log.getStackTraceString(throwable));
         } finally {

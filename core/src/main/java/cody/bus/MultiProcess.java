@@ -1,12 +1,12 @@
 /*
  * ************************************************************
  * 文件：MultiProcess.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2022年09月12日 17:58:58
- * 上次修改时间：2022年09月12日 17:47:29
+ * 当前修改时间：2023年05月27日 12:23:16
+ * 上次修改时间：2023年05月27日 12:20:43
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
- * Copyright (c) 2022
+ * Copyright (c) 2023
  * ************************************************************
  */
 
@@ -16,7 +16,7 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSON;
 
-interface MultiProcess {
+public interface MultiProcess {
     int MSG_ON_POST = 0x05;// service分发到当前进程的消息
     int MSG_ON_POST_STICKY = 0x06;// service分发到当前进程的Sticky消息
     int MSG_ON_RESET_STICKY = 0x07;// service分发到当前进程重置sticky
@@ -59,9 +59,10 @@ interface MultiProcess {
 
     /**
      * 发送数据前进行编码
+     *
      * @param eventWrapper 事件包装类
-     * @param value 值
-     * @param <T> 类型
+     * @param value        值
+     * @param <T>          类型
      * @return 事件包装类
      */
     static <T> EventWrapper encode(EventWrapper eventWrapper, T value) {
@@ -71,39 +72,42 @@ interface MultiProcess {
 
     /**
      * 接收数据后进行解码
+     *
      * @param eventWrapper 事件包装类
-     * @param what 消息
+     * @param what         消息
      */
     static void decode(final EventWrapper eventWrapper, final int what) {
-        Object value = null;
-        switch (what) {
-            case MultiProcess.MSG_ON_POST:
-                try {
-                    value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                if (value == null){
-                    ElegantLog.e(" MSG_ON_POST value is null" + eventWrapper.toString());
-                    return;
-                }
-                BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
-                break;
-            case MultiProcess.MSG_ON_POST_STICKY:
-                try {
-                    value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                if (value == null){
-                    ElegantLog.e(" MSG_ON_POST value is null" + eventWrapper.toString());
-                    return;
-                }
-                BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
-                break;
-            case MultiProcess.MSG_ON_RESET_STICKY:
-                BusFactory.ready().create(eventWrapper).resetStickyToCurrentProcess();
-                break;
-        }
+        BusFactory.ready().getSingleExecutorService().execute(() -> {
+            Object value = null;
+            switch (what) {
+                case MultiProcess.MSG_ON_POST:
+                    try {
+                        value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (value == null) {
+                        ElegantLog.e(" MSG_ON_POST value is null" + eventWrapper);
+                        return;
+                    }
+                    BusFactory.ready().create(eventWrapper).postToCurrentProcess(value);
+                    break;
+                case MultiProcess.MSG_ON_POST_STICKY:
+                    try {
+                        value = JSON.parseObject(eventWrapper.json, Class.forName(eventWrapper.type));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (value == null) {
+                        ElegantLog.e(" MSG_ON_POST value is null" + eventWrapper);
+                        return;
+                    }
+                    BusFactory.ready().create(eventWrapper).postStickyToCurrentProcess(value);
+                    break;
+                case MultiProcess.MSG_ON_RESET_STICKY:
+                    BusFactory.ready().create(eventWrapper).resetStickyToCurrentProcess();
+                    break;
+            }
+        });
     }
 }

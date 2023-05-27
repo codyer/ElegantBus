@@ -1,12 +1,12 @@
 /*
  * ************************************************************
  * 文件：ActiveLiveDataWrapper.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2022年09月12日 17:58:58
- * 上次修改时间：2022年09月12日 17:47:29
+ * 当前修改时间：2023年05月27日 12:23:16
+ * 上次修改时间：2023年05月27日 12:20:43
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
- * Copyright (c) 2022
+ * Copyright (c) 2023
  * ************************************************************
  */
 
@@ -17,7 +17,6 @@ import android.os.Looper;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -99,11 +98,13 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
         postToCurrentProcess(value);
         //转发到其他进程
         if (mEventWrapper.multiProcess) {
-            if (BusFactory.getDelegate() != null) {
-                BusFactory.getDelegate().postToService(mEventWrapper, value);
-            } else {
-                ElegantLog.w("you should use ElegantBusX to support multi process event bus.");
-            }
+            BusFactory.ready().getSingleExecutorService().execute(() -> {
+                if (BusFactory.getDelegate() != null) {
+                    BusFactory.getDelegate().postToService(mEventWrapper, value);
+                } else {
+                    ElegantLog.w("you should use ElegantBusX to support multi process event bus.");
+                }
+            });
         }
     }
 

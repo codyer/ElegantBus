@@ -1,12 +1,12 @@
 /*
  * ************************************************************
  * 文件：BusFactory.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2022年09月12日 17:58:58
- * 上次修改时间：2022年09月12日 17:47:29
+ * 当前修改时间：2023年05月27日 12:23:16
+ * 上次修改时间：2023年05月27日 12:01:20
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
- * Copyright (c) 2022
+ * Copyright (c) 2023
  * ************************************************************
  */
 
@@ -28,19 +28,20 @@ import androidx.annotation.NonNull;
  * Created by xu.yi. on 2019/3/31.
  * 和生命周期绑定的事件总线,创建基于事件的总线，对不同group进行隔离
  */
-class BusFactory {
+public class BusFactory {
     private final Object mLock = new Object();
     private volatile Handler mMainHandler;
     private final ExecutorService mExecutorService;
+    private final ExecutorService mSingleExecutorService;
     //不同group的bus集
     private final Map<String, EventGroupHolder> mGroupBus;
     private MultiProcess mDelegate;
 
-    static void setDelegate(final MultiProcess MultiProcess) {
+    public static void setDelegate(final MultiProcess MultiProcess) {
         ready().mDelegate = MultiProcess;
     }
 
-    static MultiProcess getDelegate() {
+    public static MultiProcess getDelegate() {
         return ready().mDelegate;
     }
 
@@ -55,6 +56,7 @@ class BusFactory {
     private BusFactory() {
         mGroupBus = new HashMap<>();
         mExecutorService = Executors.newCachedThreadPool();
+        mSingleExecutorService = Executors.newSingleThreadExecutor();
     }
 
     @NonNull
@@ -77,11 +79,15 @@ class BusFactory {
         return eventGroupHolder.getBus(eventWrapper);
     }
 
-    ExecutorService getExecutorService() {
+    public ExecutorService getExecutorService() {
         return mExecutorService;
     }
 
-    Handler getMainHandler() {
+    public ExecutorService getSingleExecutorService() {
+        return mSingleExecutorService;
+    }
+
+    public Handler getMainHandler() {
         if (mMainHandler == null) {
             synchronized (mLock) {
                 if (mMainHandler == null) {
@@ -96,12 +102,12 @@ class BusFactory {
      * 每个group一个总线集
      * 每个group是独立的，不同group之间事件不互通
      */
-    final static class EventGroupHolder {
+    private final static class EventGroupHolder {
         final Map<String, LiveDataWrapper<?>> eventBus = new HashMap<>();
 
         EventGroupHolder(EventWrapper eventWrapper) {
             if (!eventBus.containsKey(eventWrapper.event)) {
-                eventBus.put(eventWrapper.event, new ActiveLiveDataWrapper(eventWrapper));
+                eventBus.put(eventWrapper.event, new ActiveLiveDataWrapper<>(eventWrapper));
             }
         }
 
