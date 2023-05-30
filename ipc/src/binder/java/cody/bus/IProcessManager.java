@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：IProcessManager.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年05月25日 12:34:48
- * 上次修改时间：2023年05月25日 12:31:15
+ * 当前修改时间：2023年06月01日 17:08:51
+ * 上次修改时间：2023年06月01日 10:19:14
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -96,7 +96,7 @@ public interface IProcessManager extends IInterface {
                     } else {
                         eventWrapper = null;
                     }
-                    this.postToService(eventWrapper);
+                    this.postToProcessManager(eventWrapper);
                     reply.writeNoException();
                     return true;
                 }
@@ -169,7 +169,7 @@ public interface IProcessManager extends IInterface {
             }
 
             @Override
-            public void postToService(EventWrapper eventWrapper) throws RemoteException {
+            public void postToProcessManager(EventWrapper eventWrapper) throws RemoteException {
                 Parcel _data = Parcel.obtain();
                 Parcel _reply = Parcel.obtain();
                 try {
@@ -201,5 +201,5 @@ public interface IProcessManager extends IInterface {
 
     void resetSticky(EventWrapper eventWrapper) throws RemoteException;
 
-    void postToService(EventWrapper eventWrapper) throws RemoteException;
+    void postToProcessManager(EventWrapper eventWrapper) throws RemoteException;
 }

@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ActiveLiveDataWrapper.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2023年05月27日 12:23:16
- * 上次修改时间：2023年05月27日 12:20:43
+ * 当前修改时间：2023年06月01日 17:08:51
+ * 上次修改时间：2023年06月01日 17:08:39
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
@@ -14,10 +14,6 @@ package cody.bus;
 
 import android.os.Looper;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,11 +21,13 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 
 /**
- * Created by xu.yi. on 2019/3/31.
- * 和lifecycle绑定的事件总线
- * 每添加一个observer，LiveDataWrapper 的序列号增加1，并赋值给新加的observer，
+ * Created by xu.yi. on 2019/3/31. 和lifecycle绑定的事件总线 每添加一个observer，LiveDataWrapper 的序列号增加1，并赋值给新加的observer，
  * 每次消息更新使用目前的序列号进行请求，持有更小的序列号才需要获取变更通知。
  * <p>
  * 解决会收到注册前发送的消息更新问题
@@ -100,7 +98,7 @@ public class ActiveLiveDataWrapper<T> implements LiveDataWrapper<T> {
         if (mEventWrapper.multiProcess) {
             BusFactory.ready().getSingleExecutorService().execute(() -> {
                 if (BusFactory.getDelegate() != null) {
-                    BusFactory.getDelegate().postToService(mEventWrapper, value);
+                    BusFactory.getDelegate().postToProcessManager(mEventWrapper, value);
                 } else {
                     ElegantLog.w("you should use ElegantBusX to support multi process event bus.");
                 }

@@ -1,0 +1,34 @@
+<!--
+  ~ *************************************************************
+  ~ 文件：ProviderAndroidManifest.xml  模块：ElegantBus.ipc.main  项目：ElegantBus
+  ~ 当前修改时间：2023年06月01日 18:33:18
+  ~ 上次修改时间：2023年06月01日 18:29:14
+  ~ 作者：Cody.yi   https://github.com/codyer
+  ~
+  ~ 描述：ElegantBus.ipc.main
+  ~ Copyright (c) 2023
+  ~ *************************************************************
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cody.bus.ipc">
+    <!-- 读写 外部存储 权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <queries>
+        <package android:name="${BUS_MAIN_APPLICATION_ID}" />
+        <provider android:authorities="${BUS_MAIN_APPLICATION_ID}.BusContentProvider" />
+    </queries>
+
+    <application android:requestLegacyExternalStorage="true">
+
+        <provider android:name="cody.bus.BusContentProvider"
+            android:authorities="${BUS_MAIN_APPLICATION_ID}.BusContentProvider"
+            android:enabled="true"
+            android:exported="${BUS_SUPPORT_MULTI_APP}"
+            android:permission="${BUS_MAIN_APPLICATION_ID}.ipc.PERMISSION"
+            android:process="${BUS_MAIN_APPLICATION_ID}.ElegantBusProcessManager" />
+    </application>
+
+</manifest>

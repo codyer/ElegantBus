@@ -2,7 +2,7 @@
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
  * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 10:29:02
+ * 上次修改时间：2023年06月01日 14:28:20
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -12,17 +12,13 @@
 
 package cody.bus;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.os.RemoteException;
 
 /**
- * 支持进程间事件总线的扩展，每个进程有一个实例 aidl 实现
+ * 支持进程间事件总线的扩展，每个进程有一个实例 ContentProvider 实现
  */
-public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProcess {
+public class MultiProcessImpl implements MultiProcess {
     private boolean mIsBound;
     private String mPkgName;
     private Context mContext;
@@ -40,6 +36,7 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
     public void support(Context context) {
         mContext = context;
         mPkgName = ElegantUtil.getHostPackageName(context);
+        BusContentProvider.addUriMatcher(mPkgName);
         bindService();
     }
 
@@ -78,16 +75,6 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
         }
     }
 
-    @Override
-    public String processName() {
-        return ElegantUtil.getProcessName();
-    }
-
-    @Override
-    public void call(final EventWrapper eventWrapper, final int what) {
-        ElegantUtil.decode(eventWrapper, what);
-    }
-
     private boolean isBind() {
         if (mContext == null) {
             return false;
@@ -105,66 +92,23 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
      */
     private synchronized void bindService() {
         if (mContext == null) return;
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setComponent(new ComponentName(pkgName(), ElegantBusService.class.getName()));
-        mIsBound = mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        if (!mIsBound) {
-            ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
-            if (ElegantLog.isDebug()) {
-                throw new RuntimeException("Can not find the host app under :" + pkgName());
-            }
+        mProcessManager = new ProcessManager(mContext);
+        try {
+            mProcessManager.register();
+            mIsBound = true;
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            mIsBound = false;
         }
     }
 
     private synchronized void unbindService() {
         if (mIsBound) {
-            if (mProcessManager != null && mProcessManager.asBinder().isBinderAlive()) {
-                try {
-                    // 取消注册
-                    mProcessManager.unregister(MultiProcessImpl.this);
-                    mProcessManager.asBinder().unlinkToDeath(mDeathRecipient, 0);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+            if (mProcessManager != null) {
+                mProcessManager.unregister();
             }
-            mContext.unbindService(mServiceConnection);
             mIsBound = false;
         }
         mContext = null;
     }
-
-    private final IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
-        @Override
-        public void binderDied() {
-            if (mProcessManager == null) {
-                return;
-            }
-            mProcessManager.asBinder().unlinkToDeath(mDeathRecipient, 0);
-            mProcessManager = null;
-            bindService();
-        }
-    };
-
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mProcessManager = IProcessManager.Stub.asInterface(service);
-            if (mProcessManager == null) {
-                return;
-            }
-            try {
-                service.linkToDeath(mDeathRecipient, 0);
-                mProcessManager.register(MultiProcessImpl.this);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mProcessManager = null;
-            ElegantLog.d("onServiceDisconnected, process = " + processName());
-        }
-    };
 }

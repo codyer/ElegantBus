@@ -1,0 +1,62 @@
+/*
+ * ************************************************************
+ * 文件：EventBean.java  模块：ElegantBus.ipc  项目：ElegantBus
+ * 当前修改时间：2023年06月01日 17:08:51
+ * 上次修改时间：2023年06月01日 16:05:27
+ * 作者：Cody.yi   https://github.com/codyer
+ *
+ * 描述：ElegantBus.ipc
+ * Copyright (c) 2023
+ * ************************************************************
+ */
+
+package cody.bus.db;
+
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity
+public class EventBean {
+    @PrimaryKey
+    @NonNull
+    public String key;
+    // 发送事件所在进程
+    @ColumnInfo(name = "process_name")
+    public String processName;
+    // 发送事件到某个分组
+    @ColumnInfo
+    public String group;
+    // 发送的事件名
+    @ColumnInfo
+    public String event;
+    // 发送的事件类型
+    @ColumnInfo
+    public String type;
+    // 发送的事件值的JSON串
+    @ColumnInfo
+    public String json;
+    // 是否支持多进程
+    @ColumnInfo(name = "multi_process")
+    public boolean multiProcess;
+
+    @ColumnInfo
+    public boolean valid = true;
+
+    public EventBean() {
+        key = "default";
+    }
+    @Ignore
+    public EventBean(@NonNull String key, String processName, String group, String event, String type, String json,
+            boolean multiProcess) {
+        this.key = key;
+        this.processName = processName;
+        this.group = group;
+        this.event = event;
+        this.type = type;
+        this.json = json;
+        this.multiProcess = multiProcess;
+    }
+}

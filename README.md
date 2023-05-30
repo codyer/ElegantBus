@@ -63,8 +63,8 @@ Google官方也在 LocalBroadcastManager 的说明里面建议使用LiveData替�
 > 原因
 >
 > LocalBroadcastManager 是应用级事件总线，在您的应用中使用了层违规行为；任何组件都可以监听来自其他任何组件的事件。
-它继承了系统 BroadcastManager 不必要的用例限制；开发者必须使用 Intent，即使对象只存在且始终存在于一个进程中。由于同一原因，它未遵循功能级 BroadcastManager。
-这些问题同时出现，会对开发者造成困扰。
+> 它继承了系统 BroadcastManager 不必要的用例限制；开发者必须使用 Intent，即使对象只存在且始终存在于一个进程中。由于同一原因，它未遵循功能级 BroadcastManager。
+> 这些问题同时出现，会对开发者造成困扰。
 >
 > 替换
 >
@@ -105,17 +105,25 @@ dependencies {
 //  implementation "com.github.codyer.ElegantBus:ipc-binder:$version" // 跨进程时使用（方式1：binder 实现，已经包含 core）
 //  implementation "com.github.codyer.ElegantBus:ipc-aidl:$version" // 跨进程时使用（方式2：aidl 实现，已经包含 core）
 //  implementation "com.github.codyer.ElegantBus:ipc-messenger:$version" // 跨进程时使用（方式3：messenger 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-provider:$version" // 跨进程时使用（方式3：contentProvider 实现，已经包含 core）
 //	annotationProcessor "com.github.codyer.ElegantBus:compiler:$version"// 需要事件自动管理时使用
 }
 ```
 ##### 如果不需要跨进程，以上两步配置就可以了，如果需要跨进程，第二步选择一个跨进程的方式，并添加第三步配置，且设置第四步。
 
 #### 3、在应用 gradle 文件中的 manifestPlaceholders 配置是否支持跨 App，以及主 App 的 applicationId
+
 ```
 manifestPlaceholders = [
     BUS_SUPPORT_MULTI_APP  : true,// 是否支持跨App
     BUS_MAIN_APPLICATION_ID: "com.example.bus" // 肯定会被安装的主app的applicationId
 ]
+
+对应子App使用对应子引用
+//  implementation "com.github.codyer.ElegantBus:ipc-binder_sub:$version" // 跨进程时使用（方式1：binder 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-aidl_sub:$version" // 跨进程时使用（方式2：aidl 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-messenger_sub:$version" // 跨进程时使用（方式3：messenger 实现，已经包含 core）
+//  implementation "com.github.codyer.ElegantBus:ipc-provider_sub:$version" // 跨进程时使用（方式3：contentProvider 实现，已经包含 core）
 ```
 
 为了App安全性，必须使用相同的密钥签名的App才可以设置为一个公用组，否则Debug模式下会抛出异常，Release模式下会输出 error 信息。

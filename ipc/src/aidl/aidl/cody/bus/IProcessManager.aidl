@@ -8,5 +8,5 @@ interface IProcessManager {
     void register(IProcessCallback callback);
     void unregister(IProcessCallback callback);
     void resetSticky(in EventWrapper eventWrapper);
-    void postToService(in EventWrapper eventWrapper);
+    void postToProcessManager(in EventWrapper eventWrapper);
 }

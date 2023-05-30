@@ -1,8 +1,8 @@
 <!--
   ~ *************************************************************
   ~ 文件：AndroidManifest.xml  模块：ElegantBus.ipc.main  项目：ElegantBus
-  ~ 当前修改时间：2023年02月24日 17:46:20
-  ~ 上次修改时间：2023年02月24日 13:07:43
+  ~ 当前修改时间：2023年06月01日 18:33:18
+  ~ 上次修改时间：2023年06月01日 18:27:02
   ~ 作者：Cody.yi   https://github.com/codyer
   ~
   ~ 描述：ElegantBus.ipc.main
@@ -10,28 +10,19 @@
   ~ *************************************************************
   -->
 
-<manifest package="cody.bus.ipc"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cody.bus.ipc">
 
-    <permission
-        android:name="${applicationId}.ipc.PERMISSION"
+    <permission android:name="${BUS_MAIN_APPLICATION_ID}.ipc.PERMISSION"
         android:label="bus process service permission"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
     <uses-permission android:name="${BUS_MAIN_APPLICATION_ID}.ipc.PERMISSION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
-
-        <service
-            android:name="cody.bus.ElegantBusService"
-            android:enabled="true"
-            android:exported="${BUS_SUPPORT_MULTI_APP}"
-            android:permission="${BUS_MAIN_APPLICATION_ID}.ipc.PERMISSION"
-            android:process="${BUS_MAIN_APPLICATION_ID}.ElegantBusService" >
-            <meta-data android:name="BUS_SUPPORT_MULTI_APP" android:value="${BUS_SUPPORT_MULTI_APP}"/>
-            <meta-data android:name="BUS_MAIN_APPLICATION_ID" android:value="${BUS_MAIN_APPLICATION_ID}"/>
-        </service>
+        <meta-data android:name="BUS_SUPPORT_MULTI_APP"
+            android:value="${BUS_SUPPORT_MULTI_APP}" />
+        <meta-data android:name="BUS_MAIN_APPLICATION_ID"
+            android:value="${BUS_MAIN_APPLICATION_ID}" />
     </application>
-
 </manifest>

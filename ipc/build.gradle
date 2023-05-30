@@ -13,15 +13,66 @@
 apply from: "${project.rootDir}/config-aar.gradle"
 
 android {
-    flavorDimensions "ipc"
+    defaultConfig {
+        flavorDimensions "ipc"
+    }
+    sourceSets {
+        aidl {
+            manifest.srcFile 'src/ServiceAndroidManifest.xml'
+        }
+        aidl_sub {
+            aidl.srcDirs += 'src/aidl/aidl'
+            java.srcDirs += 'src/aidl/java'
+            manifest.srcFile 'src/ServiceSubAndroidManifest.xml'
+        }
+        binder {
+            java.srcDirs += 'src/aidl/java'
+            manifest.srcFile 'src/ServiceAndroidManifest.xml'
+        }
+        binder_sub {
+            java.srcDirs += 'src/aidl/java'
+            java.srcDirs += 'src/binder/java'
+            manifest.srcFile 'src/ServiceSubAndroidManifest.xml'
+        }
+        messenger {
+            manifest.srcFile 'src/ServiceAndroidManifest.xml'
+        }
+        messenger_sub {
+            java.srcDirs += 'src/messenger/java'
+            manifest.srcFile 'src/ServiceSubAndroidManifest.xml'
+        }
+        provider {
+            manifest.srcFile 'src/ProviderAndroidManifest.xml'
+        }
+        provider_sub {
+            java.srcDirs += 'src/provider/java'
+            manifest.srcFile 'src/ProviderSubAndroidManifest.xml'
+        }
+    }
+
     productFlavors {
         aidl {
+            flavorDimensions("ipc")
+        }
+        aidl_sub {
             flavorDimensions("ipc")
         }
         binder {
             flavorDimensions("ipc")
         }
+        binder_sub {
+            flavorDimensions("ipc")
+        }
         messenger {
+            flavorDimensions("ipc")
+        }
+        messenger_sub {
+            flavorDimensions("ipc")
+        }
+        provider {
+            flavorDimensions("ipc")
+        }
+        provider_sub {
             flavorDimensions("ipc")
         }
     }
@@ -29,4 +80,7 @@ android {
 
 dependencies {
     api project(':core')
+    def room_version = "2.4.2"
+    api "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 }
