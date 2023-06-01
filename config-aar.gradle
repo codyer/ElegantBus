@@ -85,7 +85,7 @@ afterEvaluate {
                             configurations.api.allDependencies.each {
                                 println("++++++++++ AAA it : " + it.version + " , group : " + it.group + " , project : " + rootProject.name)
                                 def dependencyNode = dependenciesNode.appendNode('dependency')
-                                if (it.version == "unspecified" || it.group == rootProject.name) {
+                                if (it.version == "unspecified" || it.group == rootProject.name || it.group == "com.github.codyer") {
                                     dependencyNode.appendNode('groupId', rootProject.ext.groupId)
                                     dependencyNode.appendNode('artifactId', it.name)
                                     dependencyNode.appendNode('version', rootProject.ext.version)
