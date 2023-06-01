@@ -83,9 +83,9 @@ afterEvaluate {
                             def dependenciesNode = asNode().appendNode('dependencies')
                             // Iterate over the api dependencies (we don't want the test ones), adding a <dependency> node for each
                             configurations.api.allDependencies.each {
-                                println("++++++++++ AAA it : " + it.version)
+                                println("++++++++++ AAA it : " + it.version + " , group : " + it.group)
                                 def dependencyNode = dependenciesNode.appendNode('dependency')
-                                if (it.version == "unspecified") {
+                                if (it.version == "unspecified" || it.group == "ElegantBus") {
                                     dependencyNode.appendNode('groupId', rootProject.ext.groupId)
                                     dependencyNode.appendNode('artifactId', it.name)
                                     dependencyNode.appendNode('version', rootProject.ext.version)
