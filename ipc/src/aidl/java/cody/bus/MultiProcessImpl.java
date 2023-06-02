@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 10:29:02
+ * 当前修改时间：2023年06月02日 16:58:02
+ * 上次修改时间：2023年06月02日 16:57:16
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -85,7 +85,9 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
 
     @Override
     public void call(final EventWrapper eventWrapper, final int what) {
-        ElegantUtil.decode(eventWrapper, what);
+        BusFactory.ready().getSingleExecutorService().execute(() -> {
+            ElegantUtil.decode(eventWrapper, what);
+        });
     }
 
     private boolean isBind() {

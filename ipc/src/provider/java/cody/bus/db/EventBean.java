@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：EventBean.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月02日 11:27:48
- * 上次修改时间：2023年06月02日 11:27:46
+ * 当前修改时间：2023年06月02日 16:58:02
+ * 上次修改时间：2023年06月02日 16:57:26
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -17,7 +17,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "event_cache_table")
 public class EventBean {
     @PrimaryKey
     @NonNull
