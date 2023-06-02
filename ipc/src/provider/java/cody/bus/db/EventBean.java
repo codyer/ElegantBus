@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：EventBean.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 16:05:27
+ * 文件：EventBean.java  模块：ElegantBus.ipc.main  项目：ElegantBus
+ * 当前修改时间：2023年06月02日 11:27:48
+ * 上次修改时间：2023年06月02日 11:27:46
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc
+ * 描述：ElegantBus.ipc.main
  * Copyright (c) 2023
  * ************************************************************
  */
@@ -15,7 +15,6 @@ package cody.bus.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -41,22 +40,12 @@ public class EventBean {
     // 是否支持多进程
     @ColumnInfo(name = "multi_process")
     public boolean multiProcess;
-
     @ColumnInfo
     public boolean valid = true;
+    @ColumnInfo
+    public long time;
 
     public EventBean() {
         key = "default";
-    }
-    @Ignore
-    public EventBean(@NonNull String key, String processName, String group, String event, String type, String json,
-            boolean multiProcess) {
-        this.key = key;
-        this.processName = processName;
-        this.group = group;
-        this.event = event;
-        this.type = type;
-        this.json = json;
-        this.multiProcess = multiProcess;
     }
 }
