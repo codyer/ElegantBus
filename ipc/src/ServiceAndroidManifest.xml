@@ -1,8 +1,8 @@
 <!--
   ~ *************************************************************
   ~ 文件：ServiceAndroidManifest.xml  模块：ElegantBus.ipc  项目：ElegantBus
-  ~ 当前修改时间：2023年06月02日 16:58:02
-  ~ 上次修改时间：2023年06月02日 16:57:16
+  ~ 当前修改时间：2023年06月05日 20:59:58
+  ~ 上次修改时间：2023年06月05日 20:43:19
   ~ 作者：Cody.yi   https://github.com/codyer
   ~
   ~ 描述：ElegantBus.ipc
@@ -20,8 +20,12 @@
 
     <application>
 
+        <activity android:name="cody.bus.HostStubActivity" android:exported="true"
+            android:process="${BUS_MAIN_APPLICATION_ID}.ElegantBusHostProcess"
+            android:theme="@android:style/Theme.NoDisplay" />
+
         <service android:name="cody.bus.ElegantBusService" android:enabled="true"
             android:exported="${BUS_SUPPORT_MULTI_APP}" android:permission="${BUS_MAIN_APPLICATION_ID}.ipc.PERMISSION"
-            android:process="${BUS_MAIN_APPLICATION_ID}.ElegantBusProcessManager" />
+            android:process="${BUS_MAIN_APPLICATION_ID}.ElegantBusHostProcess" android:visibleToInstantApps="true" />
     </application>
 </manifest>

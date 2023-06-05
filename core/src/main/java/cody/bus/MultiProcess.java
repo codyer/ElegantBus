@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcess.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 17:08:38
+ * 当前修改时间：2023年06月05日 20:59:58
+ * 上次修改时间：2023年06月05日 20:43:19
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
@@ -19,6 +19,8 @@ public interface MultiProcess {
     int MSG_ON_POST_STICKY = 0x06;// service分发到当前进程的Sticky消息
     int MSG_ON_RESET_STICKY = 0x07;// service分发到当前进程重置sticky
     String MSG_DATA = "MSG_DATA";
+
+    boolean isBound();
 
     /**
      * 进程创建时调用，一般在 Application 的 onCreate 中调用 多应用且多进程场景请使用

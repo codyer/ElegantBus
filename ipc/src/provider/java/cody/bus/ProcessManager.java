@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManager.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月02日 16:58:02
- * 上次修改时间：2023年06月02日 16:57:16
+ * 当前修改时间：2023年06月05日 20:59:58
+ * 上次修改时间：2023年06月05日 20:59:07
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -37,6 +37,7 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
 
     private final Context mContext;
     private final Uri mUri;
+    private boolean mIsInit = false;
     private ContentProviderClient mContentProviderClient;
 
     public ProcessManager(Context context) {
@@ -45,6 +46,10 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
         mUri = new Uri.Builder().scheme("content")
                 .authority(ElegantUtil.getHostPackageName(context) + ".BusContentProvider")
                 .build();
+    }
+
+    private boolean isBound() {
+        return mContentProviderClient != null;
     }
 
     @Override
@@ -59,10 +64,12 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
                 if (cursor != null) {
                     while (cursor.moveToNext()) {
                         EventWrapper eventWrapper = DataUtil.convert(cursor);
-                        if (ElegantUtil.isSameProcess(ElegantUtil.getProcessName(), eventWrapper.processName) &&
-                                what != MultiProcess.MSG_ON_POST_STICKY) {
+                        if ((mIsInit && what == MultiProcess.MSG_ON_POST_STICKY) ||
+                                (ElegantUtil.isSameProcess(ElegantUtil.getProcessName(), eventWrapper.processName) &&
+                                        what != MultiProcess.MSG_ON_POST_STICKY)) {
                             ElegantLog.d("This is in same process, already posted, Event = " + eventWrapper);
                         } else {
+                            mIsInit = true;
                             ElegantLog.d("call back " + what + " to other process : " + ElegantUtil.getProcessName() +
                                     ", Event = " +
                                     eventWrapper);
@@ -75,14 +82,21 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
     }
 
     @Override
-    public void register() throws RemoteException {
+    public boolean register() throws RemoteException {
         ElegantLog.d("register mProcessName : " + ElegantUtil.getProcessName() + ",mUri : " + mUri);
         if (ElegantUtil.isServiceProcess(ElegantUtil.getProcessName())) {
             ElegantLog.d("register isServiceProcess");
-            return;
+            return false;
         }
-        mContext.getContentResolver().registerContentObserver(mUri, true, this);
-        callProvider(MultiProcess.MSG_ON_POST_STICKY, mUri.toString(), null);
+        if (!isBound()) {
+            mContentProviderClient = mContext.getContentResolver().acquireContentProviderClient(mUri);
+            ElegantLog.d("ProcessManager acquireContentProviderClient : " + mContentProviderClient);
+            if (isBound()) {
+                mContext.getContentResolver().registerContentObserver(mUri, true, this);
+                callProvider(MultiProcess.MSG_ON_POST_STICKY, mUri.toString(), null);
+            }
+        }
+        return isBound();
     }
 
     @Override
@@ -92,9 +106,12 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
             ElegantLog.d("unregister isServiceProcess");
             return;
         }
-        mContext.getContentResolver().unregisterContentObserver(this);
-        if (mContentProviderClient != null) {
-            mContentProviderClient.release();
+        if (isBound()) {
+            mContext.getContentResolver().unregisterContentObserver(this);
+            if (mContentProviderClient != null) {
+                mContentProviderClient.release();
+            }
+            mIsInit = false;
         }
     }
 
@@ -125,15 +142,8 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
     }
 
     private void callProvider(int method, String arg, Bundle extras) throws RemoteException {
-        if (mContentProviderClient == null) {
-            mContentProviderClient = mContext.getContentResolver().acquireContentProviderClient(mUri);
-            ElegantLog.d("callProvider mContentProviderClient acquireContentProviderClient");
+        if (isBound()) {
+            mContentProviderClient.call(String.valueOf(method), arg, extras);
         }
-        if (mContentProviderClient == null) {
-            ElegantLog.e("callProvider mContentProviderClient is still null");
-            mContext.getContentResolver().call(mUri, String.valueOf(method), arg, extras);
-            return;
-        }
-        mContentProviderClient.call(String.valueOf(method), arg, extras);
     }
 }

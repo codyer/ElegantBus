@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月02日 16:58:02
- * 上次修改时间：2023年06月02日 16:57:16
+ * 当前修改时间：2023年06月05日 20:59:58
+ * 上次修改时间：2023年06月05日 20:43:19
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -59,7 +59,7 @@ public class MultiProcessImpl implements IProcessCallback, MultiProcess {
     @Override
     public <T> void postToProcessManager(EventWrapper eventWrapper, T value) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.postToProcessManager(ElegantUtil.encode(eventWrapper, value));
             }
         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class MultiProcessImpl implements IProcessCallback, MultiProcess {
     @Override
     public void resetSticky(final EventWrapper eventWrapper) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
@@ -90,7 +90,8 @@ public class MultiProcessImpl implements IProcessCallback, MultiProcess {
         });
     }
 
-    private boolean isBind() {
+    @Override
+    public boolean isBound() {
         if (mContext == null) {
             return false;
         }

@@ -148,11 +148,30 @@ public class BusApplication extends Application {
 }
 ```
 
+#### 5、某些机型无法正常打开主应用进程，导致跨App功能异常，需要主动在子应用启动activity中添加以下代码
+
+```
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ElegantBusX.fixHighLevelAndroid(this, () -> {
+        // 这里可以提示用户开启相关权限
+            ElegantLog.e("you should accept the request !");
+            // 返回true意味着会一直请求直到用户授权
+            return true;
+        });
+    }
+
+```
+
 ##### 以上几步就完成了使用 ElegantBus 的全部配置，下面进入使用环节
 
 ### （二）ElegantBus 使用说明
+
 #### 1、 发送事件
+
 最简单方式就是直接一句
+
 ```
 ElegantBus.getDefault("EventA").post(new Object());
 ElegantBus.getDefault("EventA").post("eventA");
