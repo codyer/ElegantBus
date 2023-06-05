@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManager.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月05日 20:59:58
- * 上次修改时间：2023年06月05日 20:59:07
+ * 当前修改时间：2023年06月05日 21:06:21
+ * 上次修改时间：2023年06月05日 21:04:26
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -69,7 +69,6 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
                                         what != MultiProcess.MSG_ON_POST_STICKY)) {
                             ElegantLog.d("This is in same process, already posted, Event = " + eventWrapper);
                         } else {
-                            mIsInit = true;
                             ElegantLog.d("call back " + what + " to other process : " + ElegantUtil.getProcessName() +
                                     ", Event = " +
                                     eventWrapper);
@@ -77,6 +76,7 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
                         }
                     }
                 }
+                mIsInit = true;
             });
         }
     }
