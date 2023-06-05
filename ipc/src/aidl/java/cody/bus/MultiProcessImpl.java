@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月02日 16:58:02
- * 上次修改时间：2023年06月02日 16:57:16
+ * 当前修改时间：2023年06月05日 20:43:19
+ * 上次修改时间：2023年06月05日 16:05:46
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -59,7 +59,7 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
     @Override
     public <T> void postToProcessManager(EventWrapper eventWrapper, T value) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.postToProcessManager(ElegantUtil.encode(eventWrapper, value));
             }
         } catch (Exception e) {
@@ -70,7 +70,7 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
     @Override
     public void resetSticky(final EventWrapper eventWrapper) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
@@ -90,7 +90,8 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
         });
     }
 
-    private boolean isBind() {
+    @Override
+    public boolean isBound() {
         if (mContext == null) {
             return false;
         }
@@ -106,15 +107,12 @@ public class MultiProcessImpl extends IProcessCallback.Stub implements MultiProc
      * 每个进程独立，会造成无法实现多APP场景，多App需要绑定到同一个Service上， 因此需要一个主App，来承担 Service 生成的角色
      */
     private synchronized void bindService() {
-        if (mContext == null) return;
+        if (mContext == null || mIsBound) return;
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setComponent(new ComponentName(pkgName(), ElegantBusService.class.getName()));
         mIsBound = mContext.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         if (!mIsBound) {
             ElegantLog.e("\n\nCan not find the host app under :" + pkgName());
-            if (ElegantLog.isDebug()) {
-                throw new RuntimeException("Can not find the host app under :" + pkgName());
-            }
         }
     }
 

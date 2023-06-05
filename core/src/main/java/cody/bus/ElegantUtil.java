@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ElegantUtil.java  模块：ElegantBus.core.main  项目：ElegantBus
- * 当前修改时间：2023年06月02日 16:58:02
- * 上次修改时间：2023年06月02日 16:57:16
+ * 当前修改时间：2023年06月05日 20:43:19
+ * 上次修改时间：2023年06月05日 16:05:46
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.core.main
@@ -28,7 +28,7 @@ class ElegantUtil {
 
     private static String mCurrentProcessName;
     private static String mHostPackageName;
-    private final static String mProcessManagerSubName = ".ElegantBusProcessManager";
+    private final static String mProcessManagerSubName = ".ElegantBusHostProcess";
 
     /**
      * 获取当前进程名

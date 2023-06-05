@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 14:28:20
+ * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc.main  项目：ElegantBus
+ * 当前修改时间：2023年06月05日 20:43:19
+ * 上次修改时间：2023年06月05日 20:43:05
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc
+ * 描述：ElegantBus.ipc.main
  * Copyright (c) 2023
  * ************************************************************
  */
@@ -56,7 +56,7 @@ public class MultiProcessImpl implements MultiProcess {
     @Override
     public <T> void postToProcessManager(EventWrapper eventWrapper, T value) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.postToProcessManager(ElegantUtil.encode(eventWrapper, value));
             }
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class MultiProcessImpl implements MultiProcess {
     @Override
     public void resetSticky(final EventWrapper eventWrapper) {
         try {
-            if (isBind()) {
+            if (isBound()) {
                 mProcessManager.resetSticky(eventWrapper);
             }
         } catch (Exception e) {
@@ -75,7 +75,8 @@ public class MultiProcessImpl implements MultiProcess {
         }
     }
 
-    private boolean isBind() {
+    @Override
+    public boolean isBound() {
         if (mContext == null) {
             return false;
         }
@@ -94,11 +95,14 @@ public class MultiProcessImpl implements MultiProcess {
         if (mContext == null) return;
         mProcessManager = new ProcessManager(mContext);
         try {
-            mProcessManager.register();
-            mIsBound = true;
+            mIsBound = mProcessManager.register();
         } catch (RemoteException e) {
             e.printStackTrace();
             mIsBound = false;
+        }
+        if (!mIsBound) {
+            mProcessManager.unregister();
+            mProcessManager = null;
         }
     }
 

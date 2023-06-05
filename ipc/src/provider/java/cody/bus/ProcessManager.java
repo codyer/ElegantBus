@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManager.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月02日 16:58:02
- * 上次修改时间：2023年06月02日 16:57:16
+ * 当前修改时间：2023年06月05日 20:43:19
+ * 上次修改时间：2023年06月05日 20:28:34
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -47,6 +47,10 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
                 .build();
     }
 
+    private boolean isBound() {
+        return mContentProviderClient != null;
+    }
+
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
@@ -75,14 +79,21 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
     }
 
     @Override
-    public void register() throws RemoteException {
+    public boolean register() throws RemoteException {
         ElegantLog.d("register mProcessName : " + ElegantUtil.getProcessName() + ",mUri : " + mUri);
         if (ElegantUtil.isServiceProcess(ElegantUtil.getProcessName())) {
             ElegantLog.d("register isServiceProcess");
-            return;
+            return false;
         }
-        mContext.getContentResolver().registerContentObserver(mUri, true, this);
-        callProvider(MultiProcess.MSG_ON_POST_STICKY, mUri.toString(), null);
+        if (!isBound()) {
+            mContentProviderClient = mContext.getContentResolver().acquireContentProviderClient(mUri);
+            ElegantLog.d("ProcessManager acquireContentProviderClient : " + mContentProviderClient);
+            if (isBound()) {
+                mContext.getContentResolver().registerContentObserver(mUri, true, this);
+                callProvider(MultiProcess.MSG_ON_POST_STICKY, mUri.toString(), null);
+            }
+        }
+        return isBound();
     }
 
     @Override
@@ -92,9 +103,11 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
             ElegantLog.d("unregister isServiceProcess");
             return;
         }
-        mContext.getContentResolver().unregisterContentObserver(this);
-        if (mContentProviderClient != null) {
-            mContentProviderClient.release();
+        if (isBound()) {
+            mContext.getContentResolver().unregisterContentObserver(this);
+            if (mContentProviderClient != null) {
+                mContentProviderClient.release();
+            }
         }
     }
 
@@ -125,15 +138,8 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
     }
 
     private void callProvider(int method, String arg, Bundle extras) throws RemoteException {
-        if (mContentProviderClient == null) {
-            mContentProviderClient = mContext.getContentResolver().acquireContentProviderClient(mUri);
-            ElegantLog.d("callProvider mContentProviderClient acquireContentProviderClient");
+        if (isBound()) {
+            mContentProviderClient.call(String.valueOf(method), arg, extras);
         }
-        if (mContentProviderClient == null) {
-            ElegantLog.e("callProvider mContentProviderClient is still null");
-            mContext.getContentResolver().call(mUri, String.valueOf(method), arg, extras);
-            return;
-        }
-        mContentProviderClient.call(String.valueOf(method), arg, extras);
     }
 }
