@@ -323,5 +323,10 @@ Map<String, List<String>> eventMap;
 + 2）、优化跨进程json处理
 + 3）、优化性能
 
+- 3.3.2
++ 1）、新增contentProvider方式
++ 2）、所有方式支持跨进程，跨App时数据防丢功能
++ 3）、Fix 魔改系统无法调用主服务问题问题，具体参见新增说明[使用说明](#使用说明)第五条
+
 ### TODO
 跨进程使用contentProvider指定发送，去中心化，定义跨进程时需要指定送达进程包含哪些applicationId，多进程APP需要指明：other
