@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：DataUtil.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月02日 11:27:48
- * 上次修改时间：2023年06月02日 11:26:43
+ * 当前修改时间：2023年06月06日 11:07:31
+ * 上次修改时间：2023年06月06日 10:33:34
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -20,6 +20,10 @@ import cody.bus.db.EventBean;
 
 public class DataUtil {
 
+    public static EventWrapper convert(EventBean bean) {
+        return new EventWrapper(bean.processName, bean.group, bean.event, bean.type, bean.json, bean.multiProcess);
+    }
+
     public static EventBean convert(EventWrapper wrapper) {
         EventBean bean = new EventBean();
         bean.key = wrapper.getKey();
@@ -33,18 +37,6 @@ public class DataUtil {
         bean.time = System.currentTimeMillis();
         return bean;
     }
-    /*
-    public static ContentValues convert(EventWrapper wrapper) {
-        ContentValues values = new ContentValues();
-        values.put(BusColumnInfo.KEY, wrapper.getKey());
-        values.put(BusColumnInfo.PROCESS_NAME, wrapper.processName);
-        values.put(BusColumnInfo.GROUP, wrapper.group);
-        values.put(BusColumnInfo.EVENT, wrapper.event);
-        values.put(BusColumnInfo.TYPE, wrapper.type);
-        values.put(BusColumnInfo.JSON, wrapper.json);
-        values.put(BusColumnInfo.MULTI_PROCESS, wrapper.multiProcess);
-        return values;
-    }*/
 
     public static EventBean convert(ContentValues values) {
         EventBean bean = new EventBean();

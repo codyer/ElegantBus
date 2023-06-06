@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：MultiProcessImpl.java  模块：ElegantBus.ipc  项目：ElegantBus
- * 当前修改时间：2023年06月05日 20:59:58
- * 上次修改时间：2023年06月05日 20:43:19
+ * 当前修改时间：2023年06月06日 11:07:31
+ * 上次修改时间：2023年06月06日 10:33:35
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc
@@ -18,6 +18,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+
+import cody.bus.db.EventDataBase;
 
 /**
  * 支持进程间事件总线的扩展，每个进程有一个实例 aidl 实现

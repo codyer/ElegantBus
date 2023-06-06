@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：BusContentProvider.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月01日 18:33:18
- * 上次修改时间：2023年06月01日 17:26:50
+ * 文件：BusContentProvider.java  模块：ElegantBus.ipc  项目：ElegantBus
+ * 当前修改时间：2023年06月06日 11:07:31
+ * 上次修改时间：2023年06月06日 10:28:01
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc.main
+ * 描述：ElegantBus.ipc
  * Copyright (c) 2023
  * ************************************************************
  */
@@ -24,7 +24,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.room.Room;
 
 import cody.bus.db.EventBean;
 import cody.bus.db.EventDataBase;
@@ -38,7 +37,6 @@ public class BusContentProvider extends ContentProvider {
     public static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int CACHES = 1;
     private static final int CACHE = 2;
-    private EventDataBase mEventDataBase;
     private Context mContext;
     private Uri mUri;
 
@@ -60,14 +58,7 @@ public class BusContentProvider extends ContentProvider {
                 .authority(ElegantUtil.getHostPackageName(mContext) + AUTHORITY_END)
                 .path(PATH_CACHES)
                 .build();
-        if (mContext != null) {
-            mEventDataBase =
-                    Room.databaseBuilder(mContext, EventDataBase.class,
-                                    ElegantUtil.getHostPackageName(mContext) + ".db")
-                            .build();
-        } else {
-            ElegantLog.e("BusContentProvider onCreate.");
-        }
+        EventDataBase.init(mContext, ElegantUtil.getHostPackageName(mContext));
         return true;
     }
 
@@ -83,8 +74,9 @@ public class BusContentProvider extends ContentProvider {
                         if (extras != null) {
                             extras.setClassLoader(getClass().getClassLoader());
                             EventWrapper eventWrapper = extras.getParcelable(MultiProcess.MSG_DATA);
-                            assert eventWrapper != null;
-                            mEventDataBase.eventDao().insert(DataUtil.convert(eventWrapper));
+                            if (eventWrapper != null) {
+                                EventDataBase.getInstance().eventDao().insert(DataUtil.convert(eventWrapper));
+                            }
                             notifyChange(arg, what);
                         }
                     }
@@ -100,7 +92,7 @@ public class BusContentProvider extends ContentProvider {
                             assert eventWrapper != null;
                             EventBean bean = DataUtil.convert(eventWrapper);
                             bean.valid = false;
-                            mEventDataBase.eventDao().update(bean);
+                            EventDataBase.getInstance().eventDao().update(bean);
                             notifyChange(arg, what);
                         }
                     }
@@ -123,16 +115,16 @@ public class BusContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-            @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         ElegantLog.d("BusContentProvider query. uri : " + uri + ", selection " + selection);
         int match = sUriMatcher.match(uri);
         ElegantLog.d("BusContentProvider query. match : " + match + ",uri : " + uri);
         if (match == CACHES) {
-            return mEventDataBase.eventDao().getAllCursor();
+            return EventDataBase.getInstance().eventDao().getAllCursor();
         }
         if (match == CACHE) {
             selection = uri.getQueryParameter(MultiProcess.MSG_DATA);
-            return mEventDataBase.eventDao().getByKey(selection);
+            return EventDataBase.getInstance().eventDao().getByKeyCursor(selection);
         }
         return null;
     }
@@ -157,7 +149,7 @@ public class BusContentProvider extends ContentProvider {
         if (sUriMatcher.match(uri) == CACHE && values != null) {
             ElegantLog.w("BusContentProvider insert match. uri : " + uri + ", values " + values);
             EventBean bean = DataUtil.convert(values);
-            mEventDataBase.eventDao().insert(bean);
+            EventDataBase.getInstance().eventDao().insert(bean);
         }
         return uri;
     }
@@ -169,14 +161,14 @@ public class BusContentProvider extends ContentProvider {
             ElegantLog.w("BusContentProvider delete match. uri : " + uri + ", selection " + selection);
             EventBean bean = new EventBean();
             bean.key = selection;
-            return mEventDataBase.eventDao().delete(bean);
+            return EventDataBase.getInstance().eventDao().delete(bean);
         }
         return 0;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
-            @Nullable String[] selectionArgs) {
+                      @Nullable String[] selectionArgs) {
         return 0;
     }
 }

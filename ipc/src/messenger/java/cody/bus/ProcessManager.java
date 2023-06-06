@@ -1,8 +1,8 @@
 /*
  * ************************************************************
  * 文件：ProcessManager.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月01日 17:08:51
- * 上次修改时间：2023年06月01日 14:10:34
+ * 当前修改时间：2023年06月06日 11:07:31
+ * 上次修改时间：2023年06月06日 10:40:09
  * 作者：Cody.yi   https://github.com/codyer
  *
  * 描述：ElegantBus.ipc.main
@@ -50,7 +50,7 @@ public class ProcessManager extends Handler implements IProcessManager {
             try {
                 mProcessCallback.call(eventWrapper, msg.what);
             } catch (RemoteException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
         super.handleMessage(msg);

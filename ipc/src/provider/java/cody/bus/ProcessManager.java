@@ -1,11 +1,11 @@
 /*
  * ************************************************************
- * 文件：ProcessManager.java  模块：ElegantBus.ipc.main  项目：ElegantBus
- * 当前修改时间：2023年06月05日 21:06:21
- * 上次修改时间：2023年06月05日 21:04:26
+ * 文件：ProcessManager.java  模块：ElegantBus.ipc  项目：ElegantBus
+ * 当前修改时间：2023年06月06日 11:07:31
+ * 上次修改时间：2023年06月06日 09:46:27
  * 作者：Cody.yi   https://github.com/codyer
  *
- * 描述：ElegantBus.ipc.main
+ * 描述：ElegantBus.ipc
  * Copyright (c) 2023
  * ************************************************************
  */
@@ -37,7 +37,7 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
 
     private final Context mContext;
     private final Uri mUri;
-    private boolean mIsInit = false;
+    private boolean mInitialized = false;
     private ContentProviderClient mContentProviderClient;
 
     public ProcessManager(Context context) {
@@ -55,28 +55,31 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
-        ElegantLog.d("onChange : mProcessName : " + ElegantUtil.getProcessName() + ", selfChange : " + selfChange +
+        ElegantLog.d("onChange : mProcessName : " + ElegantUtil.getProcessName() +
+                ", mIsInit : " + mInitialized +
+                ", selfChange : " + selfChange +
                 ", uri : " + uri);
         if (uri != null) {
             int what = (int) ContentUris.parseId(uri);
             BusFactory.ready().getSingleExecutorService().execute(() -> {
+                if (mInitialized && what == MultiProcess.MSG_ON_POST_STICKY) {
+                    ElegantLog.d("This is already posted, what = " + what);
+                    return;
+                }
                 Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
                 if (cursor != null) {
                     while (cursor.moveToNext()) {
                         EventWrapper eventWrapper = DataUtil.convert(cursor);
-                        if ((mIsInit && what == MultiProcess.MSG_ON_POST_STICKY) ||
-                                (ElegantUtil.isSameProcess(ElegantUtil.getProcessName(), eventWrapper.processName) &&
-                                        what != MultiProcess.MSG_ON_POST_STICKY)) {
+                        if ((ElegantUtil.isSameProcess(ElegantUtil.getProcessName(), eventWrapper.processName) && mInitialized)) {
                             ElegantLog.d("This is in same process, already posted, Event = " + eventWrapper);
                         } else {
-                            ElegantLog.d("call back " + what + " to other process : " + ElegantUtil.getProcessName() +
-                                    ", Event = " +
-                                    eventWrapper);
+                            ElegantLog.d("call back " + what + " to other process : " +
+                                    ElegantUtil.getProcessName() + ", Event = " + eventWrapper);
                             ElegantUtil.decode(eventWrapper, what);
                         }
                     }
                 }
-                mIsInit = true;
+                mInitialized = true;
             });
         }
     }
@@ -91,7 +94,7 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
         if (!isBound()) {
             mContentProviderClient = mContext.getContentResolver().acquireContentProviderClient(mUri);
             ElegantLog.d("ProcessManager acquireContentProviderClient : " + mContentProviderClient);
-            if (isBound()) {
+            if (isBound() && !mInitialized) {
                 mContext.getContentResolver().registerContentObserver(mUri, true, this);
                 callProvider(MultiProcess.MSG_ON_POST_STICKY, mUri.toString(), null);
             }
@@ -111,7 +114,7 @@ public class ProcessManager extends ContentObserver implements IProcessManager {
             if (mContentProviderClient != null) {
                 mContentProviderClient.release();
             }
-            mIsInit = false;
+            mInitialized = false;
         }
     }
 
